@@ -6,6 +6,47 @@ import { supabase } from '../supabaseClient'
  * @param {string} filter - Фильтр: 'all', 'income', 'expense'
  * @returns {Promise<Array>} Массив транзакций
  */
+const parseDescription = (description) => {
+  if (!description) {
+    return {
+      category: 'Прочее',
+      comment: '',
+    }
+  }
+
+  try {
+    const parsed = JSON.parse(description)
+    if (parsed && typeof parsed === 'object') {
+      return {
+        category: parsed.category || 'Прочее',
+        comment: parsed.comment || '',
+      }
+    }
+    return {
+      category: 'Прочее',
+      comment: description,
+    }
+  } catch (_err) {
+    return {
+      category: 'Прочее',
+      comment: description,
+    }
+  }
+}
+
+const serializeDescription = ({ category, comment }) => {
+  const payload = {
+    category: category || 'Прочее',
+    comment: comment || '',
+  }
+
+  try {
+    return JSON.stringify(payload)
+  } catch (_err) {
+    return comment || ''
+  }
+}
+
 export const getTransactions = async (userId, filter = 'all') => {
   try {
     let query = supabase
@@ -23,7 +64,14 @@ export const getTransactions = async (userId, filter = 'all') => {
     const { data, error } = await query
 
     if (error) throw error
-    return data || []
+    return (data || []).map((item) => {
+      const { category, comment } = parseDescription(item.description)
+      return {
+        ...item,
+        category,
+        comment,
+      }
+    })
   } catch (error) {
     console.error('Error fetching transactions:', error)
     throw error
@@ -38,7 +86,13 @@ export const getTransactions = async (userId, filter = 'all') => {
  * @param {string} description - Описание (опционально)
  * @returns {Promise<Object>} Созданная транзакция
  */
-export const addTransaction = async (userId, type, amount, description = null) => {
+export const addTransaction = async (
+  userId,
+  type,
+  amount,
+  description = null,
+  options = {},
+) => {
   try {
     if (!userId || !type || !amount || amount <= 0) {
       throw new Error('Неверные параметры транзакции')
@@ -48,21 +102,33 @@ export const addTransaction = async (userId, type, amount, description = null) =
       throw new Error('Тип должен быть "income" или "expense"')
     }
 
+    const payload = {
+      user_id: userId,
+      type,
+      amount: parseFloat(amount),
+      description: serializeDescription({
+        category: options.category,
+        comment: description,
+      }),
+    }
+
+    if (options.date) {
+      payload.created_at = options.date
+    }
+
     const { data, error } = await supabase
       .from('transactions')
-      .insert([
-        {
-          user_id: userId,
-          type,
-          amount: parseFloat(amount),
-          description: description?.trim() || null,
-        },
-      ])
+      .insert([payload])
       .select()
       .single()
 
     if (error) throw error
-    return data
+    const { category, comment } = parseDescription(data.description)
+    return {
+      ...data,
+      category,
+      comment,
+    }
   } catch (error) {
     console.error('Error adding transaction:', error)
     throw error
@@ -93,8 +159,26 @@ export const updateTransaction = async (transactionId, updates) => {
       updateData.amount = parseFloat(updates.amount)
     }
     
-    if (updates.description !== undefined) {
-      updateData.description = updates.description?.trim() || null
+    let category = updates.category
+    let comment = updates.description
+
+    if (updates.comment !== undefined) {
+      comment = updates.comment
+    }
+
+    if (updates.description !== undefined && comment === undefined) {
+      comment = updates.description
+    }
+
+    if (updates.category !== undefined || updates.description !== undefined || updates.comment !== undefined) {
+      updateData.description = serializeDescription({
+        category: category ?? updates.currentCategory ?? updates.previousCategory,
+        comment: comment ?? updates.currentComment ?? '',
+      })
+    }
+
+    if (updates.created_at) {
+      updateData.created_at = updates.created_at
     }
 
     const { data, error } = await supabase
@@ -105,7 +189,12 @@ export const updateTransaction = async (transactionId, updates) => {
       .single()
 
     if (error) throw error
-    return data
+    const { category: parsedCategory, comment: parsedComment } = parseDescription(data.description)
+    return {
+      ...data,
+      category: parsedCategory,
+      comment: parsedComment,
+    }
   } catch (error) {
     console.error('Error updating transaction:', error)
     throw error

@@ -17,11 +17,54 @@ body {
   overflow-x: hidden;
 }
 
+:root.light {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-background, #f3f4f6);
+}
+
 #root {
   min-height: 100vh;
   min-height: 100dvh; /* Dynamic viewport height для мобильных */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   background-attachment: fixed;
+  position: relative;
+}
+
+#root::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3), transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(120, 219, 255, 0.2), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+:root.dark body {
+  background-color: #0a0e27;
+}
+
+:root.dark #root {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+}
+
+:root.dark #root::before {
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15), transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.1), transparent 50%);
 }
 
 /* Плавная анимация для модальных окон */
@@ -36,8 +79,47 @@ body {
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Glassmorphism эффект */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Кастомный скроллбар */
