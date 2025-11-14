@@ -138,17 +138,17 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">₽</span>
-              <input
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min="0"
-                value={amount}
-                onChange={(event) => setAmount(event.target.value)}
+            <input
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              min="0"
+              value={amount}
+              onChange={(event) => setAmount(event.target.value)}
                 className={`${inputClass} text-lg font-semibold pl-10 h-14`}
-                placeholder="0.00"
-                required
-              />
+              placeholder="0.00"
+              required
+            />
             </div>
             {errors.amount ? <p className="mt-1 text-sm text-red-400">{errors.amount}</p> : null}
           </div>
