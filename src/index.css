@@ -1,6 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --dash-bg: #030314;
+  --dash-surface: #0b0f1f;
+  --dash-surface-muted: #161b2e;
+  --dash-border: rgba(255, 255, 255, 0.08);
+  --dash-text: #f6f4ff;
+}
 
 * {
   box-sizing: border-box;
@@ -9,65 +19,34 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Space Grotesk', Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-}
-
-:root.light {
-  color-scheme: light;
-}
-
-:root.dark {
-  color-scheme: dark;
-}
-
-body {
-  background-color: var(--color-background, #f3f4f6);
+  background-color: #000000;
+  color: var(--dash-text);
 }
 
 #root {
   min-height: 100vh;
-  min-height: 100dvh; /* Dynamic viewport height для мобильных */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  background-attachment: fixed;
+  min-height: 100dvh;
+  background: linear-gradient(to bottom, #111827, #000000);
   position: relative;
 }
 
 #root::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3), transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(120, 219, 255, 0.2), transparent 50%);
+    radial-gradient(circle at 20% 15%, rgba(59, 130, 246, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 5%, rgba(139, 92, 246, 0.12), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.1), transparent 40%);
   pointer-events: none;
   z-index: 0;
 }
 
-:root.dark body {
-  background-color: #0a0e27;
-}
-
-:root.dark #root {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-}
-
-:root.dark #root::before {
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15), transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15), transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.1), transparent 50%);
-}
-
-/* Плавная анимация для модальных окон */
 @keyframes slideUp {
   from {
     transform: translateY(100%);
@@ -107,22 +86,6 @@ body {
   animation: fadeIn 0.4s ease-out;
 }
 
-/* Glassmorphism эффект */
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.glass-dark {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Кастомный скроллбар */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -132,11 +95,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.35);
 }
-

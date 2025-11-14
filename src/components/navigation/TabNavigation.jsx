@@ -1,36 +1,84 @@
+import { useLocale } from '../../context/LocaleContext.jsx'
+
 const TABS = [
-  { id: 'history', label: 'История расходов', icon: '🧾' },
-  { id: 'add', label: 'Добавление', icon: '➕' },
-  { id: 'stats', label: 'Статистика', icon: '📊' },
-  { id: 'settings', label: 'Настройки', icon: '⚙️' },
+  { id: 'history', labelKey: 'nav.history' },
+  { id: 'add', labelKey: 'nav.add' },
+  { id: 'stats', labelKey: 'nav.stats' },
+  { id: 'ai', labelKey: 'nav.ai' },
+  { id: 'settings', labelKey: 'nav.settings' },
 ]
 
+const Icon = ({ id, active }) => {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    strokeWidth: 1.5,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    stroke: active ? '#ffffff' : 'rgba(255,255,255,0.45)',
+  }
+
+  switch (id) {
+    case 'history':
+      return (
+        <svg {...common}>
+          <path d="M3 11.5 12 4l9 7.5v8.5a1 1 0 0 1-1 1h-6.5v-5h-3v5H4a1 1 0 0 1-1-1z" />
+        </svg>
+      )
+    case 'add':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 8v8M8 12h8" />
+        </svg>
+      )
+    case 'stats':
+      return (
+        <svg {...common}>
+          <path d="M5 19V9m7 10V5m7 14v-7" />
+          <path d="M4 19h16" stroke={active ? '#7af0c7' : 'rgba(255,255,255,0.4)'} />
+        </svg>
+      )
+    case 'ai':
+      return (
+        <svg {...common}>
+          <path d="m12 3 2 3.5 4 1-2.5 3.6.4 4.4L12 14.5 8.1 15.5l.4-4.4L6 7.5l4-1z" />
+        </svg>
+      )
+    case 'settings':
+    default:
+      return (
+        <svg {...common}>
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          <path d="m19.4 15-.9 1.5.4 1.7-1.6 1.6-1.7-.4-1.5.9L12 19.5l-1.6.8-1.5-.9-1.7.4-1.6-1.6.4-1.7-.9-1.5.9-1.5-.4-1.7 1.6-1.6 1.7.4 1.5-.9L12 4.5l1.6-.8 1.5.9 1.7-.4 1.6 1.6-.4 1.7.9 1.5-.9 1.5.4 1.7z" />
+        </svg>
+      )
+  }
+}
+
 const TabNavigation = ({ activeTab, onChange }) => {
+  const { t } = useLocale()
+
   return (
-    <nav className="sticky bottom-0 inset-x-0 z-50">
-      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-white/30 dark:border-slate-700/50 shadow-2xl">
-        <div className="grid grid-cols-4 max-w-4xl mx-auto">
+    <nav>
+      <div className="mx-auto rounded-2xl border border-gray-700/50 bg-gray-800/50 backdrop-blur-sm px-3 py-3 shadow-lg shadow-purple-500/10">
+        <div className="grid grid-cols-5 gap-1">
           {TABS.map((tab) => {
             const isActive = tab.id === activeTab
             return (
               <button
                 key={tab.id}
                 onClick={() => onChange(tab.id)}
-                className={`relative flex flex-col items-center gap-1.5 py-4 text-sm font-bold transition-all duration-300 ${
+                className={`flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] transition-all ${
                   isActive
-                    ? 'text-indigo-600 dark:text-indigo-400'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-purple-500/25'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                 }`}
               >
-                <span className={`text-2xl transition-transform duration-300 ${
-                  isActive ? 'scale-110' : 'scale-100'
-                }`}>
-                  {tab.icon}
-                </span>
-                <span className="text-xs">{tab.label}</span>
-                {isActive && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-12 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-lg" />
-                )}
+                <Icon id={tab.id} active={isActive} />
+                {t(tab.labelKey)}
               </button>
             )
           })}

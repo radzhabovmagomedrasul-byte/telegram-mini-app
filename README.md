@@ -1,25 +1,34 @@
 # Telegram Mini-App для учета личных финансов
 
-Современное приложение для учета доходов и расходов, созданное как Telegram Mini-App.
+Современное приложение для учета доходов и расходов, созданное как Telegram Mini-App с локальным хранением данных и синхронизацией через Firebase.
 
 ## Функционал
 
-- ✅ Авторизация через Supabase (email + password)
-- ✅ Учет доходов и расходов
-- ✅ Добавление, редактирование и удаление транзакций (полный CRUD)
-- ✅ Фильтрация по типу (доход / расход)
-- ✅ Отображение итогового баланса
-- ✅ Нижняя навигация с вкладками: история, добавление, статистика, настройки
-- ✅ Статистика с графиками по категориям и по времени
-- ✅ Настройки темы, уведомлений и категорий с сохранением в localStorage
-- ✅ Современный минималистичный интерфейс
+- ✅ **Локальное хранение данных** - все данные хранятся локально в браузере
+- ✅ **Автоматический ID пользователя** - создается при первом запуске
+- ✅ **Синхронизация с Firebase** - резервное копирование и восстановление данных
+- ✅ **Учет доходов и расходов** - полный CRUD для транзакций
+- ✅ **Фильтрация и поиск** - по категориям, датам и типу операций
+- ✅ **Отображение баланса** - автоматический расчет доходов и расходов
+- ✅ **AI-помощник** - анализ трат и персональные советы по оптимизации бюджета
+- ✅ **Расширенная аналитика** - графики и диаграммы по категориям и времени
+- ✅ **Экспорт/Импорт данных** - поддержка форматов JSON и CSV
+- ✅ **Резервное копирование** - автоматическое и ручное в Firebase
+- ✅ **Удаление профиля** - вручную или автоматически через 1 год неактивности
+- ✅ **Темная/Светлая тема** - автоматическое определение по системным настройкам
+- ✅ **Настройка категорий** - добавление и удаление категорий расходов
+- ✅ **Современный интерфейс** - glassmorphism эффекты и градиенты
 
 ## Технологический стек
 
 - **React** + **Vite** - фронтенд фреймворк и сборщик
 - **Telegram WebApp SDK** - интеграция с Telegram
-- **Supabase** - база данных и аутентификация
+- **Firebase Realtime Database** - синхронизация и резервное копирование
+- **localStorage** - локальное хранение данных
 - **Tailwind CSS** - стилизация
+- **Recharts** - графики и диаграммы
+- **PapaParse** - парсинг CSV файлов
+- **date-fns** - работа с датами
 
 ## Настройка проекта
 
@@ -29,156 +38,154 @@
 npm install
 ```
 
-### 2. Подключение к Supabase
+### 2. Настройка Firebase
 
-Проект уже настроен с вашими данными Supabase:
-- **Project URL:** `https://jkbspeccroxmslgzftdf.supabase.co`
-- **Anon Key:** Настроен в `src/supabaseClient.js`
+1. Создайте проект на [Firebase Console](https://console.firebase.google.com)
+2. Включите **Realtime Database** в вашем проекте
+3. Настройте правила безопасности (для тестирования можно использовать):
 
-Если нужно использовать переменные окружения, создайте файл `.env`:
+```json
+{
+  "rules": {
+    "users": {
+      "$userId": {
+        ".read": "$userId === auth.uid || true",
+        ".write": "$userId === auth.uid || true"
+      }
+    }
+  }
+}
+```
+
+4. Создайте файл `.env` в корне проекта:
 
 ```env
-VITE_SUPABASE_URL=https://jkbspeccroxmslgzftdf.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key_here
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://your-project-default-rtdb.firebaseio.com/
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
+VITE_FIREBASE_APP_ID=your-app-id
 ```
 
-### 3. Настройка Supabase
-
-1. Создайте проект на [supabase.com](https://supabase.com)
-2. Перейдите в SQL Editor и выполните следующий SQL для создания таблицы транзакций:
-
-```sql
--- Создание таблицы transactions
-CREATE TABLE transactions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
-  amount DECIMAL(10, 2) NOT NULL CHECK (amount > 0),
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Включение Row Level Security (RLS)
-ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
-
--- Политика: пользователи могут видеть только свои транзакции
-CREATE POLICY "Users can view own transactions"
-  ON transactions FOR SELECT
-  USING (auth.uid() = user_id);
-
--- Политика: пользователи могут добавлять только свои транзакции
-CREATE POLICY "Users can insert own transactions"
-  ON transactions FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
--- Политика: пользователи могут удалять только свои транзакции
-CREATE POLICY "Users can delete own transactions"
-  ON transactions FOR DELETE
-  USING (auth.uid() = user_id);
-
--- Создание индекса для быстрого поиска
-CREATE INDEX idx_transactions_user_id ON transactions(user_id);
-CREATE INDEX idx_transactions_created_at ON transactions(created_at DESC);
-```
-
-3. Выполните SQL скрипт из файла `supabase-setup.sql` в SQL Editor
-
-### 4. Запуск проекта локально
+### 3. Запуск проекта
 
 ```bash
+# Режим разработки
 npm run dev
-```
 
-Приложение будет доступно по адресу `http://localhost:3000`
-
-### 5. Сборка для продакшена
-
-```bash
+# Сборка для продакшена
 npm run build
+
+# Просмотр собранного проекта
+npm run preview
 ```
-
-Собранные файлы будут в папке `dist/`
-
-## 📱 Настройка Telegram Mini-App
-
-**Подробная инструкция по настройке и тестированию Mini-App находится в файле [TELEGRAM_SETUP.md](./TELEGRAM_SETUP.md)**
-
-Краткая версия:
-
-1. Создайте бота через [@BotFather](https://t.me/BotFather)
-2. Используйте команду `/newapp` для создания Mini-App
-3. Укажите URL вашего приложения (локально через ngrok или развернутое на хостинге)
-4. Откройте бота в Telegram и протестируйте приложение
-
-## Развертывание в Telegram
-
-1. Соберите проект: `npm run build`
-2. Загрузите содержимое папки `dist/` на хостинг (например, Vercel, Netlify, или любой другой)
-3. Создайте бота через [@BotFather](https://t.me/BotFather) в Telegram
-4. Используйте команду `/newapp` в BotFather и укажите URL вашего приложения
-5. Готово! Ваше приложение доступно через бота
 
 ## Структура проекта
 
 ```
 ├── src/
 │   ├── components/
-│   │   ├── Auth.jsx                      # Компонент авторизации
-│   │   ├── Header.jsx                    # Шапка приложения
-│   │   ├── Balance.jsx                   # Отображение баланса
-│   │   ├── TransactionsList.jsx          # (архивный) список транзакций
-│   │   ├── AddTransaction.jsx            # (архивная) форма добавления
-│   │   ├── EditTransaction.jsx           # (архивная) форма редактирования
+│   │   ├── ai/
+│   │   │   └── AIAssistant.jsx          # AI-помощник для анализа трат
 │   │   ├── navigation/
-│   │   │   └── TabNavigation.jsx         # Нижняя таб-навигация
-│   │   └── statistics/
-│   │       ├── CategoryDistribution.jsx  # График по категориям
-│   │       └── TimelineChart.jsx         # График по времени
+│   │   │   └── TabNavigation.jsx        # Нижняя навигация
+│   │   ├── statistics/
+│   │   │   ├── CategoryDistribution.jsx  # График по категориям
+│   │   │   └── TimelineChart.jsx        # График по времени
+│   │   ├── Balance.jsx                  # Компонент баланса
+│   │   ├── Header.jsx                   # Шапка приложения
+│   │   └── ...
 │   ├── context/
-│   │   └── ThemeContext.jsx              # Провайдер темы (light/dark)
+│   │   └── ThemeContext.jsx             # Контекст темы
 │   ├── hooks/
-│   │   ├── useCategories.js              # Работа с категориями (localStorage)
-│   │   └── useLocalStorage.js            # Общий хук localStorage
+│   │   ├── useCategories.js             # Хук для категорий
+│   │   └── useLocalStorage.js           # Хук для localStorage
 │   ├── pages/
-│   │   ├── AddTransactionPage.jsx        # Вкладка добавления транзакций
-│   │   ├── HistoryPage.jsx               # История расходов с фильтрами
-│   │   ├── StatisticsPage.jsx            # Статистика и графики
-│   │   └── SettingsPage.jsx              # Настройки приложения
+│   │   ├── AddTransactionPage.jsx       # Добавление транзакции
+│   │   ├── HistoryPage.jsx              # История транзакций
+│   │   ├── StatisticsPage.jsx           # Статистика и аналитика
+│   │   └── SettingsPage.jsx             # Настройки
 │   ├── services/
-│   │   └── transactionService.js         # Работа с Supabase
+│   │   ├── aiAssistantService.js        # AI-анализ трат
+│   │   ├── dataSyncService.js           # Синхронизация с Firebase
+│   │   ├── exportImportService.js       # Экспорт/импорт данных
+│   │   ├── firebaseService.js           # Работа с Firebase
+│   │   ├── localStorageService.js       # Локальное хранение
+│   │   └── transactionService.js        # CRUD транзакций
 │   ├── utils/
-│   │   └── telegram.js                   # Утилиты для Telegram WebApp
-│   ├── App.jsx                           # Главный компонент с табами
-│   ├── main.jsx                          # Точка входа и ThemeProvider
-│   ├── supabaseClient.js                 # Клиент Supabase
-│   └── index.css                         # Глобальные стили и темы
-├── index.html
+│   │   └── telegram.js                  # Утилиты Telegram WebApp
+│   ├── App.jsx                          # Главный компонент
+│   ├── main.jsx                         # Точка входа
+│   └── index.css                        # Глобальные стили
+├── .env.example                         # Пример конфигурации
 ├── package.json
 ├── vite.config.js
-├── tailwind.config.js
 └── README.md
 ```
 
-## Использование
+## Основные функции
 
-1. **Регистрация/Вход**: При первом запуске зарегистрируйтесь или войдите с существующим аккаунтом
-2. **История расходов**: В одноимённой вкладке доступны фильтры по категории, дате и поиску, а также редактирование и удаление записей
-3. **Добавление**: Вкладка "Добавление" позволяет создать расход или доход, выбрать категорию, дату и комментарий, а также добавить новую категорию
-4. **Статистика**: Вкладка "Статистика" отображает диаграммы по категориям и динамику расходов с фильтрами по типу, дате и категории
-5. **Настройки**: Вкладка "Настройки" содержит переключатель светлая/тёмная тема, управление уведомлениями и персональные категории (хранятся в localStorage)
-6. **Выход**: Кнопка "Выйти" доступна в правом верхнем углу шапки
+### Локальное хранение
 
-## API Функции
+Все данные хранятся в `localStorage` браузера:
+- Транзакции
+- Категории
+- Настройки
+- Профиль пользователя
 
-Проект использует централизованный сервис для работы с транзакциями (`src/services/transactionService.js`):
+### Синхронизация с Firebase
 
-- `getTransactions(userId, filter)` - Получение всех транзакций пользователя
-- `addTransaction(userId, type, amount, description)` - Добавление новой транзакции
-- `updateTransaction(transactionId, updates)` - Обновление транзакции
-- `deleteTransaction(transactionId)` - Удаление транзакции
-- `getBalance(userId)` - Подсчёт баланса пользователя
+- Автоматическая синхронизация каждые 5 минут (если включена)
+- Ручное создание резервной копии
+- Восстановление данных из облака
+
+### Экспорт и импорт
+
+- **JSON** - полный экспорт всех данных
+- **CSV** - экспорт транзакций для работы в Excel/Google Sheets
+- Импорт данных из ранее экспортированных файлов
+
+### AI-помощник
+
+Анализирует ваши траты и предоставляет:
+- Сравнение с предыдущим месяцем
+- Анализ по категориям
+- Персональные советы по оптимизации бюджета
+
+### Удаление профиля
+
+- **Вручную** - через настройки
+- **Автоматически** - через 1 год неактивности (выполняется на сервере)
+
+## Деплой на Vercel
+
+1. Установите Vercel CLI:
+```bash
+npm install -g vercel
+```
+
+2. Задеплойте проект:
+```bash
+vercel --prod
+```
+
+3. Настройте переменные окружения в Vercel Dashboard:
+   - Все переменные из `.env` файла
+
+4. Подключите к Telegram Bot через BotFather:
+   - Используйте URL вашего Vercel проекта
+
+## Обновление проекта
+
+После внесения изменений:
+
+```bash
+npm run build
+vercel --prod
+```
 
 ## Лицензия
 
 MIT
-

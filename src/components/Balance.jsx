@@ -1,38 +1,24 @@
+import { useLocale } from '../context/LocaleContext.jsx'
+
 const Balance = ({ balance }) => {
+  const { locale, t } = useLocale()
   const isPositive = balance >= 0
 
+  const formatted = new Intl.NumberFormat(locale === 'ru' ? 'ru-RU' : 'en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(balance)
+
   return (
-    <div className="mx-4 my-4 animate-fade-in">
-      <div className="relative overflow-hidden rounded-3xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl border border-white/20 dark:border-slate-700/50 p-8">
-        {/* Декоративный градиентный фон */}
-        <div className={`absolute inset-0 opacity-10 ${
-          isPositive 
-            ? 'bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600' 
-            : 'bg-gradient-to-br from-red-400 via-rose-500 to-pink-600'
-        }`} />
-        
-        <div className="relative text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-xs font-semibold mb-4 uppercase tracking-wider">
-            Общий баланс
-          </p>
-          <p className={`text-6xl font-black mb-4 bg-gradient-to-r ${
-            isPositive 
-              ? 'from-green-600 via-emerald-600 to-teal-600' 
-              : 'from-red-600 via-rose-600 to-pink-600'
-          } bg-clip-text text-transparent`}>
-            {isPositive ? '+' : ''}{balance.toLocaleString('ru-RU', { 
-              minimumFractionDigits: 2, 
-              maximumFractionDigits: 2 
-            })} ₽
-          </p>
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold shadow-lg ${
-            isPositive 
-              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
-              : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
-          }`}>
-            <span>{isPositive ? '✓' : '⚠'}</span>
-            <span>{isPositive ? 'Положительный' : 'Отрицательный'}</span>
-          </div>
+    <div className="my-4 animate-fade-in">
+      <div className="rounded-2xl border border-gray-700/50 bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white shadow-lg shadow-purple-500/25">
+        <p className="text-[0.65rem] uppercase tracking-[0.4em] text-blue-100">{t('balance.total')}</p>
+        <p className="mt-3 text-4xl font-bold">{formatted} ₽</p>
+        <div className="mt-4 flex items-center justify-between text-sm text-white/80">
+          <span>{t('balance.status')}</span>
+          <span className={`font-semibold ${isPositive ? 'text-green-300' : 'text-pink-300'}`}>
+            {isPositive ? t('balance.positive') : t('balance.negative')}
+          </span>
         </div>
       </div>
     </div>

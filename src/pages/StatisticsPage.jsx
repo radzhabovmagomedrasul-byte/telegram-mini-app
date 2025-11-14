@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getTransactions } from '../services/transactionService'
+import { getTransactionsList } from '../services/transactionService'
 import { useCategories } from '../hooks/useCategories'
 import CategoryDistribution from '../components/statistics/CategoryDistribution'
 import TimelineChart from '../components/statistics/TimelineChart'
 import { showAlert } from '../utils/telegram'
+import { useLocale } from '../context/LocaleContext.jsx'
 
 const defaultFilters = {
   type: 'expense',
@@ -13,28 +14,28 @@ const defaultFilters = {
 }
 
 const StatisticsPage = ({ userId, refreshToken }) => {
+  const { t } = useLocale()
   const { categories } = useCategories()
   const [transactions, setTransactions] = useState([])
   const [filters, setFilters] = useState(defaultFilters)
   const [loading, setLoading] = useState(true)
 
-  const loadTransactions = async () => {
+  const loadTransactions = () => {
     setLoading(true)
     try {
-      const data = await getTransactions(userId, 'all')
+      const data = getTransactionsList('all')
       setTransactions(data)
     } catch (error) {
       console.error('StatisticsPage error:', error)
-      showAlert('Не удалось загрузить данные для статистики')
+      showAlert(t('statistics.loadError'))
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (!userId) return
     loadTransactions()
-  }, [userId, refreshToken])
+  }, [refreshToken])
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
@@ -72,7 +73,7 @@ const StatisticsPage = ({ userId, refreshToken }) => {
     const amountsByCategory = new Map()
 
     filteredTransactions.forEach((transaction) => {
-      const key = transaction.category || 'Прочее'
+      const key = transaction.category || t('history.labels.other')
       const value = Math.abs(transaction.amount)
       amountsByCategory.set(key, (amountsByCategory.get(key) || 0) + value)
     })
@@ -100,41 +101,45 @@ const StatisticsPage = ({ userId, refreshToken }) => {
       .sort((a, b) => new Date(a.date) - new Date(b.date))
   }, [filteredTransactions])
 
+  const panelClass =
+    'rounded-[28px] border border-white/10 bg-[#111216] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.55)] text-white'
+  const labelClass = 'text-[0.65rem] uppercase tracking-[0.3em] text-white/40 mb-2 block'
+  const inputClass =
+    'rounded-2xl border border-white/10 bg-[#151720] px-4 py-2 text-white focus:border-white/40 focus:outline-none'
+
   return (
-    <div className="pb-24 space-y-6">
-      <section className="mx-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 dark:border-slate-700/50 p-5 space-y-4 animate-fade-in">
+    <div className="space-y-6 pb-28 text-white">
+      <section className={`${panelClass} space-y-4`}>
         <div className="flex flex-wrap gap-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
-              Тип
-            </label>
-            <div className="flex rounded-2xl overflow-hidden border border-gray-200 dark:border-slate-700">
+            <span className={labelClass}>{t('statistics.filters.type')}</span>
+            <div className="flex rounded-2xl border border-white/10">
               {['all', 'expense', 'income'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilters((prev) => ({ ...prev, type }))}
-                  className={`px-4 py-2 text-sm font-medium ${
-                    filters.type === type
-                      ? 'bg-indigo-500 text-white'
-                      : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300'
+                  className={`px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] ${
+                    filters.type === type ? 'bg-white/15 text-white' : 'text-white/50'
                   }`}
                 >
-                  {type === 'all' ? 'Все' : type === 'expense' ? 'Расходы' : 'Доходы'}
+                  {type === 'all'
+                    ? t('statistics.filters.all')
+                    : type === 'expense'
+                    ? t('history.expenses')
+                    : t('history.income')}
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
-              Категория
-            </label>
+            <span className={labelClass}>{t('statistics.filters.category')}</span>
             <select
               value={filters.category}
               onChange={(event) => setFilters((prev) => ({ ...prev, category: event.target.value }))}
-              className="px-4 py-2 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className={inputClass}
             >
-              <option value="all">Все категории</option>
+              <option value="all">{t('history.filters.all')}</option>
               {categories.map((category) => (
                 <option key={category} value={category}>
                   {category}
@@ -144,60 +149,52 @@ const StatisticsPage = ({ userId, refreshToken }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
-              От
-            </label>
+            <span className={labelClass}>{t('statistics.filters.from')}</span>
             <input
               type="date"
               value={filters.from}
               onChange={(event) => setFilters((prev) => ({ ...prev, from: event.target.value }))}
-              className="px-4 py-2 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
-              До
-            </label>
+            <span className={labelClass}>{t('statistics.filters.to')}</span>
             <input
               type="date"
               value={filters.to}
               onChange={(event) => setFilters((prev) => ({ ...prev, to: event.target.value }))}
-              className="px-4 py-2 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className={inputClass}
             />
           </div>
         </div>
       </section>
 
-      <section className="mx-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 dark:border-slate-700/50 p-5 space-y-6 animate-fade-in">
+      <section className={`${panelClass} space-y-4`}>
         <header>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Распределение по категориям
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Показывает, на что вы тратите больше всего средств.
+          <p className="text-[0.65rem] uppercase tracking-[0.3em] text-white/40">
+            {t('statistics.filters.category')}
           </p>
+          <h2 className="text-2xl font-semibold">{t('statistics.distributionTitle')}</h2>
+          <p className="text-sm text-white/45">{t('statistics.distributionDescription')}</p>
         </header>
 
         {loading ? (
-          <div className="py-12 text-center text-gray-500 dark:text-gray-400">Загрузка...</div>
+          <div className="py-12 text-center text-white/40">{t('statistics.loading')}</div>
         ) : (
           <CategoryDistribution data={categoryDistribution} />
         )}
       </section>
 
-      <section className="mx-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 dark:border-slate-700/50 p-5 space-y-6 animate-fade-in">
+      <section className={`${panelClass} space-y-4`}>
         <header>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Динамика расходов и доходов
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Как меняются ваши траты и поступления со временем.
-          </p>
+          <p className="text-[0.65rem] uppercase tracking-[0.3em] text-white/40">Trends</p>
+          <h2 className="text-2xl font-semibold">{t('statistics.timelineTitle')}</h2>
+          <p className="text-sm text-white/45">{t('statistics.timelineDescription')}</p>
         </header>
 
         {loading ? (
-          <div className="py-12 text-center text-gray-500 dark:text-gray-400">Загрузка...</div>
+          <div className="py-12 text-center text-white/40">{t('statistics.loading')}</div>
         ) : (
           <TimelineChart data={timelineData} />
         )}
