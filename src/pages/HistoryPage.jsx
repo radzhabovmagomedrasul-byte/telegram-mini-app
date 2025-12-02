@@ -68,7 +68,7 @@ const HistoryPage = ({
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
   const panelClass =
-    'rounded-2xl border border-gray-700/50 bg-gray-800/50 backdrop-blur-sm p-5 shadow-lg shadow-purple-500/10'
+    'rounded-[28px] border border-white/10 bg-gradient-to-b from-[#101329] via-[#080c1b] to-[#050714] shadow-[0_22px_50px_rgba(5,6,8,0.85)] p-5'
   const inline = (ruText, enText) => (locale === 'ru' ? ruText : enText)
   const quickActions = [
     {
@@ -263,7 +263,7 @@ const HistoryPage = ({
       <section className={`${panelClass} relative overflow-hidden`}>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-20" />
         <div className="relative">
-          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-gray-400">
+          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-white/35">
             {t('balance.total')}
           </p>
           <div className="mt-3 flex items-end justify-between">
@@ -273,8 +273,8 @@ const HistoryPage = ({
             <span
               className={`rounded-2xl px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
                 growthValue >= 0
-                  ? 'bg-green-500/10 border border-green-500/30 text-green-300'
-                  : 'bg-pink-500/10 border border-pink-500/30 text-pink-300'
+                  ? 'bg-white/10 text-dash-positive'
+                  : 'bg-white/10 text-dash-negative'
               }`}
             >
               {t('history.badgeGrowth')} {growthValue >= 0 ? '+' : ''}
@@ -282,36 +282,30 @@ const HistoryPage = ({
             </span>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-4">
-            <div className="rounded-2xl border border-gray-700/50 bg-gray-800/50 p-4">
-              <div className="w-10 h-10 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-green-400 text-xl">↑</span>
-              </div>
-              <p className="text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+            <div className="rounded-2xl border border-white/10 bg-[#1a1c23] p-4">
+              <p className="text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
                 {t('history.income')}
               </p>
               <p className="mt-2 text-2xl font-semibold text-white">
                 {formatCurrency(monthlyStats.income, locale)}
               </p>
-              <p className="text-[0.7rem] text-gray-400">{t('history.thisMonth')}</p>
+              <p className="text-[0.7rem] text-white/40">{t('history.thisMonth')}</p>
             </div>
-            <div className="rounded-2xl border border-gray-700/50 bg-gray-800/50 p-4">
-              <div className="w-10 h-10 bg-pink-500/10 border border-pink-500/30 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-pink-400 text-xl">↓</span>
-              </div>
-              <p className="text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+            <div className="rounded-2xl border border-white/10 bg-[#1a1c23] p-4">
+              <p className="text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
                 {t('history.expenses')}
               </p>
               <p className="mt-2 text-2xl font-semibold text-white">
                 {formatCurrency(monthlyStats.expense, locale)}
               </p>
-              <p className="text-[0.7rem] text-gray-400">{t('history.thisMonth')}</p>
+              <p className="text-[0.7rem] text-white/40">{t('history.thisMonth')}</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className={panelClass}>
-        <p className="text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+      <section className={`${panelClass} bg-[#151720]`}>
+        <p className="text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
           {t('history.quickActions')}
         </p>
         <div className="mt-4 grid grid-cols-3 gap-3">
@@ -319,16 +313,16 @@ const HistoryPage = ({
             <button
               key={action.id}
               onClick={() => handleQuickAction(action.id)}
-              className="flex flex-col gap-2 rounded-2xl border border-gray-700/50 bg-gray-800/50 p-3 text-left transition hover:border-purple-500/50 hover:bg-gray-700/30"
+              className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-[#1a1c23] p-3 text-left transition hover:border-white/30"
             >
               <span
-                className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br text-xl font-semibold text-white ${action.gradient}`}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br text-xl font-semibold text-white ${action.gradient}`}
               >
                 {action.icon}
               </span>
               <div>
                 <p className="text-sm font-semibold text-white">{t(action.labelKey)}</p>
-                <p className="text-[0.65rem] uppercase tracking-[0.2em] text-gray-400">
+                <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/40">
                   {t(action.noteKey)}
                 </p>
               </div>
@@ -340,14 +334,14 @@ const HistoryPage = ({
       <section className={panelClass}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[0.65rem] uppercase tracking-[0.35em] text-gray-400">
+            <p className="text-[0.65rem] uppercase tracking-[0.35em] text-white/40">
               {t('history.title')}
             </p>
             <h3 className="mt-1 text-xl font-semibold text-white">{t('history.subtitle')}</h3>
           </div>
           <button
             onClick={() => setFiltersOpen((prev) => !prev)}
-            className="rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-gray-400 transition hover:text-white hover:border-purple-500/50"
+            className="rounded-2xl border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-white/60 transition hover:text-white"
           >
             {filtersOpen ? t('common.filtersHide') : t('common.filtersShow')}
           </button>
@@ -356,13 +350,13 @@ const HistoryPage = ({
         {filtersOpen && (
           <div className="mt-4 grid grid-cols-1 gap-3 text-sm">
             <div>
-              <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+              <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
                 {t('history.filters.category')}
               </label>
               <select
                 value={filters.category}
                 onChange={(e) => setFilters((prev) => ({ ...prev, category: e.target.value }))}
-                className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white focus:border-purple-500/50 focus:outline-none"
+                className="w-full rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-white focus:border-white/40 focus:outline-none"
               >
                 <option value="all">{t('history.filters.all')}</option>
                 {categories.map((item) => (
@@ -374,30 +368,30 @@ const HistoryPage = ({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+                <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
                   {t('history.filters.from')}
                 </label>
                 <input
                   type="date"
                   value={filters.from}
                   onChange={(e) => setFilters((prev) => ({ ...prev, from: e.target.value }))}
-                  className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white focus:border-purple-500/50 focus:outline-none"
+                  className="w-full rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-white focus:border-white/40 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+                <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
                   {t('history.filters.to')}
                 </label>
                 <input
                   type="date"
                   value={filters.to}
                   onChange={(e) => setFilters((prev) => ({ ...prev, to: e.target.value }))}
-                  className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white focus:border-purple-500/50 focus:outline-none"
+                  className="w-full rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-white focus:border-white/40 focus:outline-none"
                 />
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+              <label className="mb-1 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
                 {t('history.filters.search')}
               </label>
               <input
@@ -405,7 +399,7 @@ const HistoryPage = ({
                 value={filters.search}
                 onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
                 placeholder={t('history.filters.placeholder')}
-                className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500/50 focus:outline-none"
+                className="w-full rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-white placeholder-white/30 focus:border-white/40 focus:outline-none"
               />
             </div>
           </div>
@@ -429,14 +423,14 @@ const HistoryPage = ({
               return (
                 <div
                   key={transaction.id}
-                  className="rounded-xl border border-gray-700/30 bg-gray-800/30 p-4 hover:border-purple-500/30 transition-colors"
+                  className="rounded-[22px] border border-white/10 bg-[#151720] p-4 shadow-[0_12px_30px_rgba(0,0,0,0.45)]"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex flex-1 items-start gap-3">
                       <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br text-xl shrink-0 ${categoryStyle.gradient}`}
+                        className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br text-xl ${categoryStyle.gradient}`}
                       >
-                        <span className="text-lg">{categoryStyle.icon}</span>
+                        {categoryStyle.icon}
                       </div>
                       <div className="flex-1 space-y-2">
                         {isEditing ? (
@@ -471,7 +465,7 @@ const HistoryPage = ({
                               min="0"
                               value={formState.amount}
                               onChange={(e) => setFormState((prev) => ({ ...prev, amount: e.target.value }))}
-                              className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white focus:border-purple-500/50 focus:outline-none"
+                              className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-white focus:border-white/40 focus:outline-none"
                               placeholder={t('add.amount')}
                             />
                             <select
@@ -482,7 +476,7 @@ const HistoryPage = ({
                                   category: e.target.value,
                                 }))
                               }
-                              className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white focus:border-purple-500/50 focus:outline-none"
+                              className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-white focus:border-white/40 focus:outline-none"
                             >
                               {categories.map((item) => (
                                 <option key={item} value={item}>
@@ -494,7 +488,7 @@ const HistoryPage = ({
                               type="date"
                               value={formState.date}
                               onChange={(e) => setFormState((prev) => ({ ...prev, date: e.target.value }))}
-                              className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white focus:border-purple-500/50 focus:outline-none"
+                              className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-white focus:border-white/40 focus:outline-none"
                             />
                             <input
                               type="text"
@@ -506,18 +500,18 @@ const HistoryPage = ({
                                 }))
                               }
                               placeholder={t('add.comment')}
-                              className="w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white focus:border-purple-500/50 focus:outline-none"
+                              className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-white focus:border-white/40 focus:outline-none"
                             />
                           </div>
                         ) : (
                           <>
-                            <p className="text-[0.65rem] uppercase tracking-[0.35em] text-gray-400">
+                            <p className="text-[0.65rem] uppercase tracking-[0.35em] text-white/35">
                               {transaction.category || t('history.labels.other')}
                             </p>
                             <p className="text-lg font-semibold text-white">
                               {transaction.comment || t('history.labels.generic')}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-white/40">
                               {formatDate(transaction.created_at, locale)}
                             </p>
                           </>
@@ -525,7 +519,7 @@ const HistoryPage = ({
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`font-semibold text-lg ${isIncome ? 'text-green-400' : 'text-pink-400'}`}>
+                      <p className={`font-mono text-lg ${isIncome ? 'text-dash-positive' : 'text-dash-negative'}`}>
                         {isIncome ? '+' : '-'}
                         {amountLabel}
                       </p>
@@ -533,8 +527,8 @@ const HistoryPage = ({
                         <span
                           className={`mt-2 inline-flex rounded-full px-3 py-1 text-[0.6rem] uppercase tracking-[0.3em] ${
                             isIncome
-                              ? 'bg-green-500/10 border border-green-500/30 text-green-300'
-                              : 'bg-pink-500/10 border border-pink-500/30 text-pink-300'
+                              ? 'bg-[rgba(122,240,199,0.15)] text-dash-positive'
+                              : 'bg-[rgba(255,143,123,0.15)] text-dash-negative'
                           }`}
                         >
                           {isIncome ? t('history.labels.income') : t('history.labels.expense')}
@@ -547,13 +541,13 @@ const HistoryPage = ({
                       <>
                         <button
                           onClick={() => handleUpdate(transaction)}
-                          className="rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-500/25"
+                          className="rounded-2xl bg-green-500 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-green-600"
                         >
                           {t('common.save')}
                         </button>
                         <button
                           onClick={resetEdit}
-                          className="rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-gray-400 transition hover:text-white hover:border-purple-500/50"
+                          className="rounded-2xl border border-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/70 transition hover:text-white"
                         >
                           {t('common.cancel')}
                         </button>
@@ -562,13 +556,13 @@ const HistoryPage = ({
                       <>
                         <button
                           onClick={() => handleEditClick(transaction)}
-                          className="rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-gray-700/50 hover:border-purple-500/50"
+                          className="rounded-2xl bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white/20"
                         >
                           {t('common.edit')}
                         </button>
                         <button
                           onClick={() => handleDelete(transaction.id)}
-                          className="rounded-xl bg-red-500/20 border border-red-500/30 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-red-300 transition hover:bg-red-500/30"
+                          className="rounded-2xl bg-red-500/20 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-red-300 transition hover:bg-red-500/30"
                         >
                           {t('common.delete')}
                         </button>

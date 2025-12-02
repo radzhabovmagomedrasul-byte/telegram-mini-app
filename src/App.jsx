@@ -139,9 +139,9 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      <div className="min-h-screen bg-dash-bg text-white">
         <div className="relative mx-auto max-w-[480px] min-h-screen px-4 pb-28 pt-6">
-          <div className="relative z-10 flex min-h-[calc(100vh-3rem)] flex-col rounded-[30px] border border-gray-800/50 bg-gradient-to-b from-gray-900/95 via-gray-900/90 to-black px-5 pb-8 pt-6 shadow-2xl shadow-purple-500/10">
+          <div className="relative z-10 flex min-h-[calc(100vh-3rem)] flex-col rounded-[30px] border border-white/5 bg-gradient-to-b from-[#1a1c23] via-[#0e1015] to-[#050608] px-5 pb-8 pt-6 shadow-dash-neon">
             <Header
               title={t('brand.name')}
               subtitle={t('brand.subtitle')}

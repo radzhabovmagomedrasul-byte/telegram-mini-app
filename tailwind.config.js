@@ -25,10 +25,6 @@ export default {
       },
       boxShadow: {
         'dash-neon': '0 25px 60px rgba(0,0,0,0.55)',
-        'dash-purple': '0 10px 25px rgba(139, 92, 246, 0.25)',
-        'dash-blue': '0 10px 25px rgba(59, 130, 246, 0.25)',
-        'dash-pink': '0 10px 25px rgba(236, 72, 153, 0.25)',
-        'dash-green': '0 10px 25px rgba(34, 197, 94, 0.25)',
       },
       borderRadius: {
         '3xl': '1.75rem',

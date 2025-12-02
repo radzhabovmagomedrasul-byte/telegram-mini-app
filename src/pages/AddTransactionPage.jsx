@@ -86,9 +86,9 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
   }
 
   const panelClass =
-    'rounded-2xl border border-gray-700/50 bg-gray-800/50 backdrop-blur-sm p-6 shadow-lg shadow-purple-500/10'
+    'rounded-[28px] border border-white/10 bg-[#111216] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.55)]'
   const inputClass =
-    'w-full rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500/50 focus:outline-none'
+    'w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none'
 
   return (
     <div className="space-y-6 pb-28 text-white">
@@ -96,24 +96,24 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
 
       <section className={`${panelClass} space-y-6`}>
         <div>
-          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-gray-400">{t('add.title')}</p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">{t('add.description')}</h2>
-          <p className="text-sm text-gray-400">{t('add.helper')}</p>
+          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-white/35">{t('add.title')}</p>
+          <h2 className="mt-2 text-2xl font-semibold">{t('add.description')}</h2>
+          <p className="text-sm text-white/45">{t('add.helper')}</p>
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <span className="text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+            <span className="text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
               {t('add.type')}
             </span>
             <div className="mt-3 grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setType('expense')}
-                className={`rounded-2xl border px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition-all ${
+                className={`rounded-2xl border px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] ${
                   type === 'expense'
-                    ? 'bg-gradient-to-r from-pink-500 to-red-500 border-pink-500 text-white shadow-lg shadow-pink-500/25'
-                    : 'border-gray-700/50 bg-gray-800/50 text-gray-400 hover:border-pink-500/50'
+                    ? 'border-transparent bg-red-500 text-white'
+                    : 'border-white/10 bg-transparent text-white/60'
                 }`}
               >
                 {t('add.expense')}
@@ -121,10 +121,10 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
               <button
                 type="button"
                 onClick={() => setType('income')}
-                className={`rounded-2xl border px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition-all ${
+                className={`rounded-2xl border px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] ${
                   type === 'income'
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/25'
-                    : 'border-gray-700/50 bg-gray-800/50 text-gray-400 hover:border-green-500/50'
+                    ? 'border-transparent bg-green-500 text-white'
+                    : 'border-white/10 bg-transparent text-white/60'
                 }`}
               >
                 {t('add.income')}
@@ -133,11 +133,9 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
           </div>
 
           <div>
-            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
               {t('add.amount')}
             </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">₽</span>
             <input
               type="number"
               inputMode="decimal"
@@ -145,16 +143,15 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
               min="0"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-                className={`${inputClass} text-lg font-semibold pl-10 h-14`}
+              className={`${inputClass} text-lg font-semibold`}
               placeholder="0.00"
               required
             />
-            </div>
             {errors.amount ? <p className="mt-1 text-sm text-red-400">{errors.amount}</p> : null}
           </div>
 
           <div className="space-y-3">
-            <label className="block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+            <label className="block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
               {t('add.category')}
             </label>
             <select
@@ -175,7 +172,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
                 value={customCategory}
                 onChange={(event) => setCustomCategory(event.target.value)}
                 placeholder={t('add.newCategoryPlaceholder')}
-                className={`${inputClass} flex-1 border-dashed border-gray-600/50`}
+                className={`${inputClass} flex-1 border-dashed`}
               />
               <button
                 type="button"
@@ -188,7 +185,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
                     showAlert(t('add.categoryAdded'))
                   }
                 }}
-                className="rounded-xl border border-gray-700/50 bg-gray-800/50 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-gray-400 hover:text-white hover:border-purple-500/50 transition"
+                className="rounded-2xl border border-white/10 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white/80 hover:text-white"
               >
                 {t('add.addCategory')}
               </button>
@@ -197,7 +194,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
           </div>
 
           <div>
-            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
               {t('add.date')}
             </label>
             <input
@@ -211,7 +208,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
           </div>
 
           <div>
-            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-gray-400">
+            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
               {t('add.comment')}
             </label>
             <textarea
@@ -226,7 +223,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 py-4 text-lg font-semibold uppercase tracking-[0.3em] text-white transition shadow-lg shadow-blue-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-2xl bg-white/15 py-4 text-lg font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? t('add.saving') : t('add.submit')}
           </button>

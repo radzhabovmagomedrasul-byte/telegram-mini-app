@@ -63,7 +63,7 @@ const TabNavigation = ({ activeTab, onChange }) => {
 
   return (
     <nav>
-      <div className="mx-auto rounded-2xl border border-gray-700/50 bg-gray-800/50 backdrop-blur-sm px-3 py-3 shadow-lg shadow-purple-500/10">
+      <div className="mx-auto rounded-[28px] border border-white/15 bg-gradient-to-r from-[#18142b] via-[#0f0f1f] to-[#18142b] px-3 py-3 shadow-dash-neon">
         <div className="grid grid-cols-5 gap-1">
           {TABS.map((tab) => {
             const isActive = tab.id === activeTab
@@ -71,10 +71,10 @@ const TabNavigation = ({ activeTab, onChange }) => {
               <button
                 key={tab.id}
                 onClick={() => onChange(tab.id)}
-                className={`flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] transition-all ${
+                className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] transition ${
                   isActive
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-purple-500/25'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                    ? 'bg-white/15 text-white shadow-[0_10px_25px_rgba(0,0,0,0.35)]'
+                    : 'text-white/50 hover:text-white'
                 }`}
               >
                 <Icon id={tab.id} active={isActive} />

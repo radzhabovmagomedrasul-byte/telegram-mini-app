@@ -102,10 +102,10 @@ const StatisticsPage = ({ userId, refreshToken }) => {
   }, [filteredTransactions])
 
   const panelClass =
-    'rounded-[28px] border border-white/10 bg-[#111216] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.55)] text-white'
+    'rounded-[28px] border border-white/10 bg-gradient-to-b from-[#1a1c23] via-[#0e1015] to-[#050608] p-6 shadow-dash-neon text-white'
   const labelClass = 'text-[0.65rem] uppercase tracking-[0.3em] text-white/40 mb-2 block'
   const inputClass =
-    'rounded-2xl border border-white/10 bg-[#151720] px-4 py-2 text-white focus:border-white/40 focus:outline-none'
+    'rounded-2xl border border-white/10 bg-[#151720] px-4 py-2 text-white placeholder-white/30 focus:border-dash-accent/50 focus:outline-none transition'
 
   return (
     <div className="space-y-6 pb-28 text-white">
