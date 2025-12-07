@@ -12,8 +12,17 @@ const ThemeContext = createContext({
 const THEME_STORAGE_KEY = 'finance-theme'
 
 export const ThemeProvider = ({ children }) => {
-  // Определение системной темы
+  // Определение системной темы (приоритет Telegram, затем системная)
   const getSystemTheme = () => {
+    // Проверяем тему Telegram WebApp
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      const telegramTheme = window.Telegram.WebApp.colorScheme
+      if (telegramTheme === 'dark' || telegramTheme === 'light') {
+        return telegramTheme
+      }
+    }
+    
+    // Fallback на системную тему
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark'
     }
@@ -36,18 +45,49 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [theme, autoTheme])
 
-  // Слушатель изменений системной темы
+  // Слушатель изменений системной темы и темы Telegram
   useEffect(() => {
     if (!autoTheme) return
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e) => {
-      const newTheme = e.matches ? 'dark' : 'light'
-      setTheme(newTheme)
-    }
+    // Слушатель изменений темы Telegram
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      const handleTelegramThemeChange = () => {
+        const telegramTheme = window.Telegram.WebApp.colorScheme
+        if (telegramTheme === 'dark' || telegramTheme === 'light') {
+          setTheme(telegramTheme)
+        }
+      }
+      
+      // Подписываемся на события изменения темы Telegram
+      window.Telegram.WebApp.onEvent('themeChanged', handleTelegramThemeChange)
+      
+      // Слушатель системной темы (fallback)
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const handleSystemChange = (e) => {
+        // Используем системную тему только если Telegram тема не определена
+        if (!window.Telegram?.WebApp?.colorScheme) {
+          const newTheme = e.matches ? 'dark' : 'light'
+          setTheme(newTheme)
+        }
+      }
 
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+      mediaQuery.addEventListener('change', handleSystemChange)
+      
+      return () => {
+        window.Telegram?.WebApp?.offEvent('themeChanged', handleTelegramThemeChange)
+        mediaQuery.removeEventListener('change', handleSystemChange)
+      }
+    } else {
+      // Fallback на системную тему, если Telegram не доступен
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const handleChange = (e) => {
+        const newTheme = e.matches ? 'dark' : 'light'
+        setTheme(newTheme)
+      }
+
+      mediaQuery.addEventListener('change', handleChange)
+      return () => mediaQuery.removeEventListener('change', handleChange)
+    }
   }, [autoTheme, setTheme])
 
   const toggleTheme = () => {

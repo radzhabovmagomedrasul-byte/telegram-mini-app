@@ -5,6 +5,7 @@ import Balance from '../components/Balance'
 import SuccessNotification from '../components/SuccessNotification'
 import { useLocale } from '../context/LocaleContext.jsx'
 import { useInputFocus } from '../hooks/useKeyboardScroll'
+import { showAlert } from '../utils/telegram'
 
 const getTodayISO = () => {
   const today = new Date()
@@ -12,7 +13,7 @@ const getTodayISO = () => {
   return today.toISOString().slice(0, 10)
 }
 
-const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
+const AddTransactionPage = ({ userId, balance, onTransactionCreated, supabaseUserId }) => {
   const { categories, addCategory } = useCategories()
   const { t, locale } = useLocale()
   const [type, setType] = useState('expense')
@@ -68,10 +69,10 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
     setLoading(true)
     try {
       const isoDate = new Date(date).toISOString()
-      addTransaction(type, parseFloat(amount), comment, {
+      await addTransaction(type, parseFloat(amount), comment, {
         category: finalCategory,
         date: isoDate,
-      })
+      }, supabaseUserId)
 
       // Анимация успешного добавления
       setSuccessMessage(t('add.success'))
@@ -108,8 +109,6 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
         />
       )}
       
-      <Balance balance={balance} />
-
       <section className="px-6 pb-4">
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-6 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
@@ -269,6 +268,16 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
           </div>
         </div>
       </section>
+      
+      {/* Balance moved to bottom with smaller size */}
+      <div className="px-6">
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-indigo-500/5 pointer-events-none"></div>
+          <div className="relative">
+            <Balance balance={balance} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -67,15 +67,28 @@ function App() {
           setIsAuthenticated(true)
           setUserId(session.user.id)
           
-          // Попытка синхронизации с Firebase (не блокируем загрузку)
-          syncFromFirebase(session.user.id)
+          // Синхронизация с Supabase (приоритет)
+          const { loadTransactionsFromSupabase, syncAllTransactionsToSupabase } = await import('./services/supabaseSyncService')
+          loadTransactionsFromSupabase(session.user.id)
             .then((synced) => {
               if (synced) {
                 setRefreshToken((prev) => prev + 1)
               }
+              // Синхронизируем локальные транзакции в Supabase
+              return syncAllTransactionsToSupabase(session.user.id)
             })
             .catch((error) => {
-              console.log('Firebase sync failed, using local data:', error)
+              console.log('Supabase sync failed, trying Firebase:', error)
+              // Fallback на Firebase
+              return syncFromFirebase(session.user.id)
+                .then((synced) => {
+                  if (synced) {
+                    setRefreshToken((prev) => prev + 1)
+                  }
+                })
+                .catch((fbError) => {
+                  console.log('Firebase sync also failed, using local data:', fbError)
+                })
             })
           
           // Обновление активности
@@ -179,6 +192,7 @@ function App() {
             userId={userId}
             balance={balance}
             onTransactionCreated={handleTransactionsChanged}
+            supabaseUserId={userId}
           />
         )
       case 'stats':
@@ -186,7 +200,7 @@ function App() {
       case 'ai':
         return <AIAssistant />
       case 'settings':
-        return <SettingsPage userId={userId} />
+        return <SettingsPage userId={userId} onLogout={handleLogout} />
       case 'history':
       default:
         return (

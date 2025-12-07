@@ -526,7 +526,7 @@ const HistoryPage = ({
     if (!confirmed) return
 
     try {
-      deleteTransaction(id)
+      await deleteTransaction(id, userId)
       showAlert(t('history.alerts.deleted'))
       loadTransactions()
       onTransactionsChanged?.()

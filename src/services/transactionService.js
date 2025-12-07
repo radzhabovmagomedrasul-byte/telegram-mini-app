@@ -28,7 +28,7 @@ export const getTransactionsList = (filter = 'all') => {
 /**
  * Добавление новой транзакции
  */
-export const addTransaction = (type, amount, comment = null, options = {}) => {
+export const addTransaction = async (type, amount, comment = null, options = {}, supabaseUserId = null) => {
   try {
     const transactions = getTransactions()
     const userId = getOrCreateUserId()
@@ -52,6 +52,15 @@ export const addTransaction = (type, amount, comment = null, options = {}) => {
     
     transactions.push(transaction)
     saveTransactions(transactions)
+    
+    // Синхронизация с Supabase (не блокируем выполнение)
+    if (supabaseUserId) {
+      import('./supabaseSyncService').then(({ saveTransactionToSupabase }) => {
+        saveTransactionToSupabase(transaction, supabaseUserId).catch(error => {
+          console.log('Supabase sync failed (will retry later):', error)
+        })
+      })
+    }
     
     return transaction
   } catch (error) {
@@ -105,11 +114,22 @@ export const updateTransaction = (transactionId, updates) => {
 /**
  * Удаление транзакции
  */
-export const deleteTransaction = (transactionId) => {
+export const deleteTransaction = async (transactionId, supabaseUserId = null) => {
   try {
     const transactions = getTransactions()
+    const transaction = transactions.find(t => t.id === transactionId)
     const filtered = transactions.filter(t => t.id !== transactionId)
     saveTransactions(filtered)
+    
+    // Синхронизация с Supabase (не блокируем выполнение)
+    if (supabaseUserId && transaction) {
+      import('./supabaseSyncService').then(({ deleteTransactionFromSupabase }) => {
+        deleteTransactionFromSupabase(transactionId, supabaseUserId).catch(error => {
+          console.log('Supabase delete sync failed:', error)
+        })
+      })
+    }
+    
     return true
   } catch (error) {
     console.error('Error deleting transaction:', error)

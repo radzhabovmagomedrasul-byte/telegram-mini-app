@@ -23,12 +23,11 @@ const TabNavigation = ({ activeTab, onChange }) => {
               <button
                 key={tab.id}
                 onClick={() => onChange(tab.id)}
-                className={`flex flex-col items-center gap-1.5 transition-all ${
+                className={`flex items-center justify-center transition-all ${
                   isActive ? 'text-white' : 'text-white/40 hover:text-white/60'
                 }`}
               >
                 <IconComponent className="size-7" strokeWidth={isActive ? 2.5 : 2} />
-                <span className="text-xs font-medium">{t(tab.labelKey)}</span>
               </button>
             )
           })}

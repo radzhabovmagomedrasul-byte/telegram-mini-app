@@ -8,8 +8,10 @@ import { syncToFirebase } from '../services/dataSyncService'
 import { clearAllData, getOrCreateUserId } from '../services/localStorageService'
 import { showAlert, showConfirm } from '../utils/telegram'
 import { useLocale } from '../context/LocaleContext.jsx'
+import { supabase } from '../supabaseClient'
+import { LogOut, Trash2 } from 'lucide-react'
 
-const SettingsPage = ({ userId }) => {
+const SettingsPage = ({ userId, onLogout }) => {
   const { theme, toggleTheme, autoTheme, setAutoTheme } = useTheme()
   const fileInputRef = useRef(null)
   const csvInputRef = useRef(null)
@@ -96,6 +98,32 @@ const SettingsPage = ({ userId }) => {
     }
   }
 
+  const handleLogout = async () => {
+    const confirmed = await showConfirm(
+      inline(
+        'Вы уверены, что хотите выйти из аккаунта?',
+        'Are you sure you want to log out?',
+      ),
+    )
+    if (!confirmed) return
+
+    try {
+      await supabase.auth.signOut()
+      clearAllData()
+      showAlert(inline('Вы успешно вышли из аккаунта', 'Successfully logged out'))
+      if (onLogout) {
+        onLogout()
+      } else {
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+      showAlert(inline('Ошибка при выходе: ', 'Logout error: ') + error.message)
+    }
+  }
+
   const handleDeleteProfile = async () => {
     const confirmed = await showConfirm(
       inline(
@@ -115,8 +143,36 @@ const SettingsPage = ({ userId }) => {
         console.error('Firebase delete error:', error)
       }
       
+      // Удаление из Supabase (если есть транзакции в Supabase)
+      try {
+        const { error: supabaseError } = await supabase
+          .from('transactions')
+          .delete()
+          .eq('user_id', currentUserId)
+        
+        if (supabaseError) {
+          console.error('Supabase delete error:', supabaseError)
+        }
+      } catch (error) {
+        console.error('Supabase delete error:', error)
+      }
+      
+      // Удаление аккаунта из Supabase Auth
+      try {
+        const { error: deleteError } = await supabase.auth.admin?.deleteUser(currentUserId)
+        if (deleteError && deleteError.message !== 'Function not found') {
+          console.error('Supabase auth delete error:', deleteError)
+        }
+      } catch (error) {
+        // Admin API может быть недоступен на клиенте, это нормально
+        console.log('Supabase admin API not available, skipping user deletion')
+      }
+      
       // Удаление локальных данных
       clearAllData()
+      
+      // Выход из сессии
+      await supabase.auth.signOut()
       
       showAlert(inline('Профиль успешно удален', 'Profile deleted'))
       setTimeout(() => {
@@ -295,17 +351,33 @@ const SettingsPage = ({ userId }) => {
         </button>
       </section>
 
-      <section className="ios-card p-6 space-y-4 border-2 border-ios-red/30">
+      <section className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-6 space-y-4">
         <div>
-          <h2 className="text-[28px] font-semibold text-ios-red">{t('settings.dangerTitle')}</h2>
-          <p className="text-[15px] text-ios-text-secondary mt-1">{t('settings.dangerDescription')}</p>
+          <h2 className="text-xl font-semibold text-white mb-1">{inline('Аккаунт', 'Account')}</h2>
+          <p className="text-sm text-white/60">{inline('Управление аккаунтом', 'Account management')}</p>
+        </div>
+        
+        <button
+          onClick={handleLogout}
+          className="w-full backdrop-blur-md bg-white/10 border border-white/20 rounded-xl px-4 py-3.5 text-left text-white font-medium hover:bg-white/15 transition-colors flex items-center gap-3"
+        >
+          <LogOut className="w-5 h-5" />
+          <span>{inline('Выйти из аккаунта', 'Log out')}</span>
+        </button>
+      </section>
+
+      <section className="backdrop-blur-xl bg-white/5 border border-red-500/30 rounded-3xl p-6 space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold text-red-400 mb-1">{t('settings.dangerTitle')}</h2>
+          <p className="text-sm text-white/60 mt-1">{t('settings.dangerDescription')}</p>
         </div>
         
         <button
           onClick={handleDeleteProfile}
-          className="ios-button-press w-full rounded-ios-lg bg-ios-red px-4 py-3.5 text-[17px] font-semibold text-white"
+          className="w-full bg-red-500/20 border border-red-500/40 rounded-xl px-4 py-3.5 text-left text-red-400 font-medium hover:bg-red-500/30 transition-colors flex items-center gap-3"
         >
-          {t('settings.dangerButton')}
+          <Trash2 className="w-5 h-5" />
+          <span>{t('settings.dangerButton')}</span>
         </button>
       </section>
     </div>
