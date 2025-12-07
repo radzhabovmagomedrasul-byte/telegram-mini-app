@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { addTransaction } from '../services/transactionService'
 import { useCategories } from '../hooks/useCategories'
 import Balance from '../components/Balance'
-import { showAlert } from '../utils/telegram'
+import SuccessNotification from '../components/SuccessNotification'
 import { useLocale } from '../context/LocaleContext.jsx'
 import { useInputFocus } from '../hooks/useKeyboardScroll'
 
@@ -23,6 +23,8 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
   const [comment, setComment] = useState('')
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const handleInputFocus = useInputFocus()
 
   const categoriesOptions = useMemo(() => categories, [categories])
@@ -71,17 +73,24 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
         date: isoDate,
       })
 
-      setAmount('')
-      setCustomCategory('')
-      setComment('')
-      setDate(getTodayISO())
-      setErrors({})
-      onTransactionCreated?.()
-      showAlert(t('add.success'))
+      // Анимация успешного добавления
+      setSuccessMessage(t('add.success'))
+      setShowSuccess(true)
+      
+      // Небольшая задержка перед сбросом формы для визуального отклика
+      setTimeout(() => {
+        setAmount('')
+        setCustomCategory('')
+        setComment('')
+        setDate(getTodayISO())
+        setErrors({})
+        onTransactionCreated?.()
+      }, 500)
     } catch (error) {
       console.error('AddTransactionPage error:', error)
       const fallback = locale === 'ru' ? 'Ошибка при добавлении транзакции' : 'Failed to add transaction'
-      showAlert(error.message || fallback)
+      setSuccessMessage(error.message || fallback)
+      setShowSuccess(true)
     } finally {
       setLoading(false)
     }
@@ -91,19 +100,48 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
     'w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50'
 
   return (
-    <div className="space-y-4 pb-32 px-4">
+    <div className="space-y-4 pb-24">
+      {showSuccess && (
+        <SuccessNotification 
+          message={successMessage} 
+          onClose={() => setShowSuccess(false)} 
+        />
+      )}
+      
       <Balance balance={balance} />
 
       <section className="px-6 pb-4">
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-6 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
           <div className="relative space-y-6">
-        <div>
-              <h2 className="text-xl font-semibold text-white leading-tight">{t('add.description')}</h2>
-              <p className="text-sm text-white/60 mt-1">{t('add.helper')}</p>
-        </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white leading-tight">{t('add.description')}</h2>
+                <p className="text-sm text-white/60 mt-1">{t('add.helper')}</p>
+              </div>
+              <button
+                type="submit"
+                form="transaction-form"
+                disabled={loading}
+                className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold px-6 py-3 rounded-xl hover:from-purple-600 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/30 disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span>{t('add.saving')}</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{t('add.submit')}</span>
+                  </>
+                )}
+              </button>
+            </div>
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
+        <form id="transaction-form" className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label className="text-xs text-white/60 uppercase tracking-wide mb-2 block">
               {t('add.type')}
@@ -227,13 +265,6 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold py-4 rounded-xl mt-2 hover:from-purple-600 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/30 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? t('add.saving') : t('add.submit')}
-          </button>
         </form>
           </div>
         </div>

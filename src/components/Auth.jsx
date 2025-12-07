@@ -96,19 +96,30 @@ const Auth = ({ onAuthSuccess }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-dash-bg">
-      <div className="w-full max-w-md">
-        <div className="rounded-[30px] border border-white/10 bg-gradient-to-b from-[#1a1c23] via-[#0e1015] to-[#050608] p-8 shadow-dash-neon">
-          <div className="mb-8 text-center">
+    <div 
+      style={{ 
+        background: '#120F25'
+      }}
+      className="min-h-screen flex items-center justify-center p-4 relative"
+    >
+      {/* Decorative blurred circles for glass effect */}
+      <div className="absolute top-20 left-10 size-64 bg-purple-600/30 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-40 right-10 size-72 bg-indigo-600/30 rounded-full blur-3xl"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-96 bg-violet-600/20 rounded-full blur-3xl"></div>
+      
+      <div className="w-full max-w-md relative z-10">
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-indigo-500/10 pointer-events-none"></div>
+          <div className="relative mb-8 text-center">
             <h2 className="text-3xl font-semibold text-white mb-2">
               {isLogin ? (locale === 'ru' ? 'Вход' : 'Sign In') : (locale === 'ru' ? 'Регистрация' : 'Sign Up')}
             </h2>
-            <p className="text-sm text-white/50 uppercase tracking-[0.2em]">
+            <p className="text-sm text-white/60 uppercase tracking-[0.2em]">
               {locale === 'ru' ? 'Добро пожаловать' : 'Welcome'}
             </p>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 relative">
             <div>
               <label className="block text-[0.65rem] uppercase tracking-[0.3em] text-white/50 mb-2">
                 Email
@@ -118,7 +129,7 @@ const Auth = ({ onAuthSuccess }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-2xl border border-white/10 bg-[#151720] text-white placeholder-white/30 focus:border-dash-accent/50 focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border-2 border-white/10 text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none transition"
                 placeholder="your@email.com"
               />
             </div>
@@ -133,7 +144,7 @@ const Auth = ({ onAuthSuccess }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-2xl border border-white/10 bg-[#151720] text-white placeholder-white/30 focus:border-dash-accent/50 focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border-2 border-white/10 text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none transition"
                 placeholder="••••••"
               />
             </div>
