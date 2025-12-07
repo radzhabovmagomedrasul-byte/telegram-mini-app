@@ -251,7 +251,7 @@ function App() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-96 bg-violet-600/20 rounded-full blur-3xl"></div>
         
         <div className="relative mx-auto max-w-[480px] min-h-screen">
-          <div className="relative z-10 flex min-h-[calc(100dvh-3rem)] flex-col pb-20">
+          <div className="relative z-10 flex min-h-[calc(100dvh-3rem)] flex-col pb-24">
             <Header
               title={t('brand.name')}
               subtitle={t('brand.subtitle')}

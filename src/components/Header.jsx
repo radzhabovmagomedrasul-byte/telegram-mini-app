@@ -10,7 +10,7 @@ const Header = ({ title, subtitle, onLogout, onAssistantClick }) => {
   }, [])
 
   return (
-    <header className="px-6 pt-12 pb-4 backdrop-blur-xl">
+    <header className="px-6 pt-4 pb-2 backdrop-blur-xl">
       <div className="flex items-center justify-between">
         {/* Иконка уведомлений (колокольчик) */}
         <button className="size-10 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
