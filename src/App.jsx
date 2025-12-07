@@ -4,6 +4,8 @@ import { getBalance } from './services/transactionService'
 import { syncFromFirebase, autoSync } from './services/dataSyncService'
 import { ThemeProvider } from './context/ThemeContext'
 import { useLocale } from './context/LocaleContext.jsx'
+import { supabase } from './supabaseClient'
+import Auth from './components/Auth'
 import Header from './components/Header'
 import TabNavigation from './components/navigation/TabNavigation'
 import AddTransactionPage from './pages/AddTransactionPage'
@@ -18,49 +20,79 @@ function App() {
   const { t } = useLocale()
   const [userId, setUserId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [balance, setBalance] = useState(0)
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB)
   const [refreshToken, setRefreshToken] = useState(0)
 
+  // Проверка сессии Supabase при загрузке
   useEffect(() => {
     let syncInterval
-    // Инициализация пользователя
-    const initUser = async () => {
+    
+    const checkSession = async () => {
       try {
-        const id = getOrCreateUserId()
-        setUserId(id)
+        const { data: { session }, error } = await supabase.auth.getSession()
         
-        // Попытка синхронизации с Firebase
-        syncFromFirebase(id)
-          .then((synced) => {
-            if (synced) {
-              setRefreshToken((prev) => prev + 1)
-            }
-          })
-          .catch((error) => {
-            console.log('Firebase sync failed, using local data:', error)
-          })
-        
-        // Обновление активности
-        updateLastActivity()
-        
-        // Автоматическая синхронизация
-        syncInterval = setInterval(() => {
-          autoSync()
-        }, 5 * 60 * 1000) // Каждые 5 минут
+        if (error) {
+          console.error('Error checking session:', error)
+          setLoading(false)
+          return
+        }
+
+        if (session?.user) {
+          // Пользователь авторизован
+          setIsAuthenticated(true)
+          setUserId(session.user.id)
+          
+          // Попытка синхронизации с Firebase
+          syncFromFirebase(session.user.id)
+            .then((synced) => {
+              if (synced) {
+                setRefreshToken((prev) => prev + 1)
+              }
+            })
+            .catch((error) => {
+              console.log('Firebase sync failed, using local data:', error)
+            })
+          
+          // Обновление активности
+          updateLastActivity()
+          
+          // Автоматическая синхронизация
+          syncInterval = setInterval(() => {
+            autoSync()
+          }, 5 * 60 * 1000) // Каждые 5 минут
+        } else {
+          // Пользователь не авторизован
+          setIsAuthenticated(false)
+        }
       } catch (error) {
         console.error('Error initializing user:', error)
+        setIsAuthenticated(false)
       } finally {
         setLoading(false)
       }
     }
 
-    initUser()
+    checkSession()
+
+    // Слушатель изменений авторизации
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setIsAuthenticated(true)
+        setUserId(session.user.id)
+        updateLastActivity()
+      } else {
+        setIsAuthenticated(false)
+        setUserId(null)
+      }
+    })
 
     return () => {
       if (syncInterval) {
         clearInterval(syncInterval)
       }
+      subscription.unsubscribe()
     }
   }, [])
 
@@ -85,11 +117,20 @@ function App() {
     updateLastActivity()
   }
 
-  const handleLogout = () => {
-    // Очистка данных при выходе (опционально)
-    // clearAllData() - если нужно
-    setUserId(null)
-    setActiveTab(DEFAULT_TAB)
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      setIsAuthenticated(false)
+      setUserId(null)
+      setActiveTab(DEFAULT_TAB)
+    } catch (error) {
+      console.error('Error logging out:', error)
+    }
+  }
+
+  const handleAuthSuccess = () => {
+    // После успешной авторизации состояние обновится через onAuthStateChange
+    setIsAuthenticated(true)
   }
 
   const content = useMemo(() => {
@@ -137,22 +178,40 @@ function App() {
     )
   }
 
+  // Показываем форму авторизации, если пользователь не авторизован
+  if (!isAuthenticated) {
+    return (
+      <ThemeProvider>
+        <Auth onAuthSuccess={handleAuthSuccess} />
+      </ThemeProvider>
+    )
+  }
+
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-dash-bg text-white">
-        <div className="relative mx-auto max-w-[480px] min-h-screen px-4 pb-28 pt-6">
-          <div className="relative z-10 flex min-h-[calc(100vh-3rem)] flex-col rounded-[30px] border border-white/5 bg-gradient-to-b from-[#1a1c23] via-[#0e1015] to-[#050608] px-5 pb-8 pt-6 shadow-dash-neon">
+      <div 
+        style={{ 
+          background: '#120F25'
+        }}
+        className="min-h-screen"
+      >
+        {/* Decorative blurred circles for glass effect */}
+        <div className="absolute top-20 left-10 size-64 bg-purple-600/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-40 right-10 size-72 bg-indigo-600/30 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-96 bg-violet-600/20 rounded-full blur-3xl"></div>
+        
+        <div className="relative mx-auto max-w-[480px] min-h-screen">
+          <div className="relative z-10 flex min-h-[calc(100dvh-3rem)] flex-col pb-20">
             <Header
               title={t('brand.name')}
               subtitle={t('brand.subtitle')}
               onLogout={handleLogout}
+              onAssistantClick={() => setActiveTab('ai')}
             />
 
-            <main className="flex-1 space-y-6 overflow-visible">{content}</main>
+            <main className="flex-1 overflow-y-auto overscroll-contain">{content}</main>
           </div>
-          <div className="fixed bottom-4 left-1/2 z-20 -translate-x-1/2 w-full max-w-[420px] px-4">
-            <TabNavigation activeTab={activeTab} onChange={setActiveTab} />
-          </div>
+          <TabNavigation activeTab={activeTab} onChange={setActiveTab} />
         </div>
       </div>
     </ThemeProvider>

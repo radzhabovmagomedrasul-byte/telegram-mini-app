@@ -17,26 +17,42 @@ const Auth = ({ onAuthSuccess }) => {
 
     try {
       if (isLogin) {
+        // Вход
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
         if (error) throw error
         if (data.user) {
-          onAuthSuccess?.()
+          // onAuthSuccess будет вызван через onAuthStateChange в App.jsx
         }
       } else {
+        // Регистрация
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
         })
         if (error) throw error
+        
         if (data.user) {
-          setError(null)
-          alert(locale === 'ru' ? 'Регистрация успешна! Теперь войдите в систему.' : 'Registration successful! Please sign in.')
-          setIsLogin(true)
-          setEmail('')
-          setPassword('')
+          // Если сессия создана сразу (email подтверждение отключено в Supabase)
+          if (data.session) {
+            // Автоматически входим - состояние обновится через onAuthStateChange
+            // Небольшая задержка для гарантии обновления состояния
+            setTimeout(() => {
+              onAuthSuccess?.()
+            }, 100)
+          } else {
+            // Требуется подтверждение email
+            setError(null)
+            const message = locale === 'ru' 
+              ? 'Регистрация успешна! Проверьте email для подтверждения аккаунта, затем войдите.' 
+              : 'Registration successful! Please check your email to confirm your account, then sign in.'
+            setError(message)
+            setIsLogin(true)
+            setEmail('')
+            setPassword('')
+          }
         }
       }
     } catch (error) {

@@ -20,8 +20,6 @@ const SettingsPage = ({ userId }) => {
   )
   const [newCategory, setNewCategory] = useState('')
   const { t, locale } = useLocale()
-  const panelClass =
-    'rounded-[28px] border border-white/10 bg-[#111216] p-6 space-y-4 text-white shadow-[0_18px_45px_rgba(0,0,0,0.55)]'
   const inline = (ruText, enText) => (locale === 'ru' ? ruText : enText)
 
   const handleAddCategory = () => {
@@ -130,37 +128,39 @@ const SettingsPage = ({ userId }) => {
   }
 
   return (
-    <div className="space-y-6 pb-28 text-white">
-      <section className={panelClass}>
-        <h2 className="text-2xl font-semibold">{t('settings.themeTitle')}</h2>
-        <p className="text-sm text-white/50">{t('settings.themeDescription')}</p>
+    <div className="space-y-4 pb-28 px-4">
+      <section className="ios-card p-6 space-y-4">
+        <div>
+          <h2 className="text-[28px] font-semibold text-ios-text-primary">{t('settings.themeTitle')}</h2>
+          <p className="text-[15px] text-ios-text-secondary mt-1">{t('settings.themeDescription')}</p>
+        </div>
         <div className="space-y-3">
-          <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#151720] px-4 py-3">
-            <div>
-              <p className="font-medium text-white">{t('settings.autoTheme')}</p>
-              <p className="text-sm text-white/45">{t('settings.autoThemeDescription')}</p>
+          <div className="flex items-center justify-between rounded-ios-lg bg-ios-gray-5 px-4 py-3.5">
+            <div className="flex-1">
+              <p className="font-medium text-[17px] text-ios-text-primary">{t('settings.autoTheme')}</p>
+              <p className="text-[15px] text-ios-text-secondary mt-0.5">{t('settings.autoThemeDescription')}</p>
             </div>
             <button
               onClick={() => setAutoTheme(!autoTheme)}
-              className={`rounded-2xl px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] ${
-                autoTheme ? 'bg-green-500 text-white' : 'bg-white/10 text-white/70'
+              className={`ios-button-press rounded-full w-12 h-7 px-1 transition-colors ${
+                autoTheme ? 'bg-ios-green' : 'bg-ios-gray-4'
               }`}
             >
-              {autoTheme ? t('settings.toggleOn') : t('settings.toggleOff')}
+              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${autoTheme ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
           </div>
           
           {!autoTheme && (
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#151720] px-4 py-3">
-              <div>
-                <p className="font-medium text-white">
+            <div className="flex items-center justify-between rounded-ios-lg bg-ios-gray-5 px-4 py-3.5">
+              <div className="flex-1">
+                <p className="font-medium text-[17px] text-ios-text-primary">
                   {theme === 'light' ? t('settings.manualLight') : t('settings.manualDark')}
                 </p>
-                <p className="text-sm text-white/45">{t('settings.manualTheme')}</p>
+                <p className="text-[15px] text-ios-text-secondary mt-0.5">{t('settings.manualTheme')}</p>
               </div>
               <button
                 onClick={toggleTheme}
-                className="rounded-2xl border border-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/10"
+                className="ios-button-press rounded-ios-lg bg-ios-blue px-5 py-2.5 text-[15px] font-semibold text-white"
               >
                 {t('settings.toggleTheme')}
               </button>
@@ -169,62 +169,61 @@ const SettingsPage = ({ userId }) => {
         </div>
       </section>
 
-      <section className={panelClass}>
-        <h2 className="text-2xl font-semibold">{t('settings.notificationsTitle')}</h2>
-        <p className="text-sm text-white/50">{t('settings.notificationsDescription')}</p>
-        <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#151720] px-4 py-3">
-          <div>
-            <p className="font-medium text-white">
-              {`${t('settings.notificationsTitle')} ${
-                notificationsEnabled ? t('settings.notificationsOn') : t('settings.notificationsOff')
-              }`}
+      <section className="ios-card p-6 space-y-4">
+        <div>
+          <h2 className="text-[28px] font-semibold text-ios-text-primary">{t('settings.notificationsTitle')}</h2>
+          <p className="text-[15px] text-ios-text-secondary mt-1">{t('settings.notificationsDescription')}</p>
+        </div>
+        <div className="flex items-center justify-between rounded-ios-lg bg-ios-gray-5 px-4 py-3.5">
+          <div className="flex-1">
+            <p className="font-medium text-[17px] text-ios-text-primary">
+              {t('settings.notificationsTitle')}
             </p>
-            <p className="text-sm text-white/45">{t('settings.notificationsDescription')}</p>
+            <p className="text-[15px] text-ios-text-secondary mt-0.5">{t('settings.notificationsDescription')}</p>
           </div>
           <button
             onClick={() => setNotificationsEnabled((prev) => !prev)}
-            className={`rounded-2xl px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] ${
-              notificationsEnabled ? 'bg-red-500/30 text-red-200' : 'bg-green-500 text-white'
+            className={`ios-button-press rounded-full w-12 h-7 px-1 transition-colors ${
+              notificationsEnabled ? 'bg-ios-green' : 'bg-ios-gray-4'
             }`}
           >
-            {notificationsEnabled ? t('settings.notificationsDisable') : t('settings.notificationsEnable')}
+            <div className={`w-5 h-5 rounded-full bg-white transition-transform ${notificationsEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
           </button>
         </div>
       </section>
 
-      <section className={panelClass}>
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold">{t('settings.categoriesTitle')}</h2>
-            <p className="text-sm text-white/50">{t('settings.categoriesDescription')}</p>
-          </div>
-          <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-[#151720] px-3 py-2">
-            <input
-              type="text"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder={t('settings.categoriesPlaceholder')}
-              className="flex-1 bg-transparent text-sm text-white placeholder-white/40 focus:outline-none"
-            />
-            <button
-              onClick={handleAddCategory}
-              className="rounded-2xl bg-white/15 px-3 py-1 text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/25"
-            >
-              {t('settings.categoriesAdd')}
-            </button>
-          </div>
+      <section className="ios-card p-6 space-y-4">
+        <div>
+          <h2 className="text-[28px] font-semibold text-ios-text-primary">{t('settings.categoriesTitle')}</h2>
+          <p className="text-[15px] text-ios-text-secondary mt-1">{t('settings.categoriesDescription')}</p>
+        </div>
+        <div className="flex items-center gap-3 rounded-ios-lg bg-ios-gray-5 px-4 py-3">
+          <input
+            type="text"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            placeholder={t('settings.categoriesPlaceholder')}
+            className="flex-1 bg-transparent text-[17px] text-ios-text-primary placeholder-ios-text-tertiary focus:outline-none"
+            onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()}
+          />
+          <button
+            onClick={handleAddCategory}
+            className="ios-button-press rounded-ios-lg bg-ios-blue px-4 py-2.5 text-[15px] font-semibold text-white"
+          >
+            {t('settings.categoriesAdd')}
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2.5">
           {categories.map((category) => (
             <div
               key={category}
-              className="flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#151720] px-3 py-2"
+              className="flex items-center justify-between gap-2 rounded-ios-lg bg-ios-gray-5 px-3 py-2.5"
             >
-              <span className="text-sm font-medium text-white">{category}</span>
+              <span className="text-[15px] font-medium text-ios-text-primary truncate">{category}</span>
               <button
                 onClick={() => handleRemoveCategory(category)}
-                className="text-xs text-red-300 hover:text-red-200"
+                className="ios-button-press text-[13px] text-ios-red flex-shrink-0"
               >
                 {t('settings.categoriesDelete')}
               </button>
@@ -233,32 +232,34 @@ const SettingsPage = ({ userId }) => {
         </div>
       </section>
 
-      <section className={panelClass}>
-        <h2 className="text-2xl font-semibold">{t('settings.exportTitle')}</h2>
-        <p className="text-sm text-white/50">{t('settings.exportDescription')}</p>
+      <section className="ios-card p-6 space-y-4">
+        <div>
+          <h2 className="text-[28px] font-semibold text-ios-text-primary">{t('settings.exportTitle')}</h2>
+          <p className="text-[15px] text-ios-text-secondary mt-1">{t('settings.exportDescription')}</p>
+        </div>
         
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-2 gap-3">
           <button
             onClick={handleExportJSON}
-            className="rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/10"
+            className="ios-button-press rounded-ios-lg bg-ios-gray-5 px-4 py-3.5 text-left text-[15px] font-semibold text-ios-text-primary"
           >
             {t('settings.exportJson')}
           </button>
           <button
             onClick={handleExportCSV}
-            className="rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/10"
+            className="ios-button-press rounded-ios-lg bg-ios-gray-5 px-4 py-3.5 text-left text-[15px] font-semibold text-ios-text-primary"
           >
             {t('settings.exportCsv')}
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/10"
+            className="ios-button-press rounded-ios-lg bg-ios-gray-5 px-4 py-3.5 text-left text-[15px] font-semibold text-ios-text-primary"
           >
             {t('settings.importJson')}
           </button>
           <button
             onClick={() => csvInputRef.current?.click()}
-            className="rounded-2xl border border-white/10 bg-[#151720] px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/10"
+            className="ios-button-press rounded-ios-lg bg-ios-gray-5 px-4 py-3.5 text-left text-[15px] font-semibold text-ios-text-primary"
           >
             {t('settings.importCsv')}
           </button>
@@ -280,25 +281,29 @@ const SettingsPage = ({ userId }) => {
         />
       </section>
 
-      <section className={panelClass}>
-        <h2 className="text-2xl font-semibold">{t('settings.backupTitle')}</h2>
-        <p className="text-sm text-white/50">{t('settings.backupDescription')}</p>
+      <section className="ios-card p-6 space-y-4">
+        <div>
+          <h2 className="text-[28px] font-semibold text-ios-text-primary">{t('settings.backupTitle')}</h2>
+          <p className="text-[15px] text-ios-text-secondary mt-1">{t('settings.backupDescription')}</p>
+        </div>
         
         <button
           onClick={handleBackupToFirebase}
-          className="w-full rounded-2xl bg-white/15 px-4 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-white/25"
+          className="ios-button-press w-full rounded-ios-lg bg-ios-blue px-4 py-3.5 text-[17px] font-semibold text-white"
         >
           {t('settings.backupButton')}
         </button>
       </section>
 
-      <section className="rounded-[28px] border border-red-500/40 bg-[#2a0f13] p-6 space-y-4 text-white shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
-        <h2 className="text-2xl font-semibold text-red-200">{t('settings.dangerTitle')}</h2>
-        <p className="text-sm text-red-200/80">{t('settings.dangerDescription')}</p>
+      <section className="ios-card p-6 space-y-4 border-2 border-ios-red/30">
+        <div>
+          <h2 className="text-[28px] font-semibold text-ios-red">{t('settings.dangerTitle')}</h2>
+          <p className="text-[15px] text-ios-text-secondary mt-1">{t('settings.dangerDescription')}</p>
+        </div>
         
         <button
           onClick={handleDeleteProfile}
-          className="w-full rounded-2xl bg-red-500 px-4 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-red-600"
+          className="ios-button-press w-full rounded-ios-lg bg-ios-red px-4 py-3.5 text-[17px] font-semibold text-white"
         >
           {t('settings.dangerButton')}
         </button>

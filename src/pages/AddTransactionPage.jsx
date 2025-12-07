@@ -4,6 +4,7 @@ import { useCategories } from '../hooks/useCategories'
 import Balance from '../components/Balance'
 import { showAlert } from '../utils/telegram'
 import { useLocale } from '../context/LocaleContext.jsx'
+import { useInputFocus } from '../hooks/useKeyboardScroll'
 
 const getTodayISO = () => {
   const today = new Date()
@@ -22,6 +23,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
   const [comment, setComment] = useState('')
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
+  const handleInputFocus = useInputFocus()
 
   const categoriesOptions = useMemo(() => categories, [categories])
 
@@ -85,35 +87,35 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
     }
   }
 
-  const panelClass =
-    'rounded-[28px] border border-white/10 bg-[#111216] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.55)]'
   const inputClass =
-    'w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none'
+    'w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50'
 
   return (
-    <div className="space-y-6 pb-28 text-white">
+    <div className="space-y-4 pb-32 px-4">
       <Balance balance={balance} />
 
-      <section className={`${panelClass} space-y-6`}>
+      <section className="px-6 pb-4">
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+          <div className="relative space-y-6">
         <div>
-          <p className="text-[0.65rem] uppercase tracking-[0.35em] text-white/35">{t('add.title')}</p>
-          <h2 className="mt-2 text-2xl font-semibold">{t('add.description')}</h2>
-          <p className="text-sm text-white/45">{t('add.helper')}</p>
+              <h2 className="text-xl font-semibold text-white leading-tight">{t('add.description')}</h2>
+              <p className="text-sm text-white/60 mt-1">{t('add.helper')}</p>
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <span className="text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
+            <label className="text-xs text-white/60 uppercase tracking-wide mb-2 block">
               {t('add.type')}
-            </span>
-            <div className="mt-3 grid grid-cols-2 gap-3">
+            </label>
+            <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => setType('expense')}
-                className={`rounded-2xl border px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] ${
+                className={`flex-1 py-3 rounded-xl font-medium text-sm transition-colors ${
                   type === 'expense'
-                    ? 'border-transparent bg-red-500 text-white'
-                    : 'border-white/10 bg-transparent text-white/60'
+                    ? 'bg-red-500/20 text-red-400 border-2 border-red-500/40'
+                    : 'bg-white/5 text-white/50 border-2 border-white/10'
                 }`}
               >
                 {t('add.expense')}
@@ -121,10 +123,10 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
               <button
                 type="button"
                 onClick={() => setType('income')}
-                className={`rounded-2xl border px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] ${
+                className={`flex-1 py-3 rounded-xl font-medium text-sm transition-colors ${
                   type === 'income'
-                    ? 'border-transparent bg-green-500 text-white'
-                    : 'border-white/10 bg-transparent text-white/60'
+                    ? 'bg-green-500/20 text-green-400 border-2 border-green-500/40'
+                    : 'bg-white/5 text-white/50 border-2 border-white/10'
                 }`}
               >
                 {t('add.income')}
@@ -133,7 +135,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
           </div>
 
           <div>
-            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
+            <label className="text-xs text-white/60 uppercase tracking-wide mb-2 block">
               {t('add.amount')}
             </label>
             <input
@@ -143,20 +145,22 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
               min="0"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              className={`${inputClass} text-lg font-semibold`}
+              onFocus={handleInputFocus}
+              className="w-full bg-white/5 border-2 border-white/10 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-purple-500/50 text-3xl font-bold"
               placeholder="0.00"
               required
             />
-            {errors.amount ? <p className="mt-1 text-sm text-red-400">{errors.amount}</p> : null}
+            {errors.amount ? <p className="mt-2 text-sm text-red-400 font-medium">{errors.amount}</p> : null}
           </div>
 
-          <div className="space-y-3">
-            <label className="block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
+          <div className="space-y-4">
+            <label className="text-xs text-white/60 uppercase tracking-wide mb-2 block">
               {t('add.category')}
             </label>
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
+              onFocus={handleInputFocus}
               className={inputClass}
             >
               {categoriesOptions.map((option) => (
@@ -171,6 +175,7 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
                 type="text"
                 value={customCategory}
                 onChange={(event) => setCustomCategory(event.target.value)}
+                onFocus={handleInputFocus}
                 placeholder={t('add.newCategoryPlaceholder')}
                 className={`${inputClass} flex-1 border-dashed`}
               />
@@ -185,36 +190,38 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
                     showAlert(t('add.categoryAdded'))
                   }
                 }}
-                className="rounded-2xl border border-white/10 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white/80 hover:text-white"
+                className="rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 px-5 py-3.5 text-sm font-semibold text-white hover:from-purple-600 hover:to-indigo-700 transition-all"
               >
                 {t('add.addCategory')}
               </button>
             </div>
-            {errors.category ? <p className="mt-1 text-sm text-red-400">{errors.category}</p> : null}
+            {errors.category ? <p className="mt-2 text-sm text-red-400">{errors.category}</p> : null}
           </div>
 
           <div>
-            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
+            <label className="text-xs text-white/60 uppercase tracking-wide mb-2 block">
               {t('add.date')}
             </label>
             <input
               type="date"
               value={date}
               onChange={(event) => setDate(event.target.value)}
+              onFocus={handleInputFocus}
               className={inputClass}
               required
             />
-            {errors.date ? <p className="mt-1 text-sm text-red-400">{errors.date}</p> : null}
+            {errors.date ? <p className="mt-2 text-sm text-red-400">{errors.date}</p> : null}
           </div>
 
           <div>
-            <label className="mb-2 block text-[0.65rem] uppercase tracking-[0.3em] text-white/35">
+            <label className="text-xs text-white/60 uppercase tracking-wide mb-2 block">
               {t('add.comment')}
             </label>
             <textarea
               value={comment}
               onChange={(event) => setComment(event.target.value)}
-              rows={3}
+              onFocus={handleInputFocus}
+              rows={4}
               className={`${inputClass} resize-none`}
               placeholder={t('add.commentPlaceholder')}
             />
@@ -223,11 +230,13 @@ const AddTransactionPage = ({ userId, balance, onTransactionCreated }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-white/15 py-4 text-lg font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold py-4 rounded-xl mt-2 hover:from-purple-600 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? t('add.saving') : t('add.submit')}
           </button>
         </form>
+          </div>
+        </div>
       </section>
     </div>
   )

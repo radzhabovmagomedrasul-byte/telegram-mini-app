@@ -17,7 +17,8 @@
     "@supabase/supabase-js": "^2.39.0",
     "recharts": "^2.10.3",
     "papaparse": "^5.4.1",
-    "date-fns": "^3.0.0"
+    "date-fns": "^3.0.0",
+    "lucide-react": "^0.344.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

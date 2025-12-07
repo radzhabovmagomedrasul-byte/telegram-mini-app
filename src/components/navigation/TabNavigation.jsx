@@ -1,84 +1,34 @@
 import { useLocale } from '../../context/LocaleContext.jsx'
+import { Home, CreditCard, Activity, User, Plus } from 'lucide-react'
 
 const TABS = [
-  { id: 'history', labelKey: 'nav.history' },
-  { id: 'add', labelKey: 'nav.add' },
-  { id: 'stats', labelKey: 'nav.stats' },
-  { id: 'ai', labelKey: 'nav.ai' },
-  { id: 'settings', labelKey: 'nav.settings' },
+  { id: 'history', labelKey: 'nav.history', icon: Home },
+  { id: 'stats', labelKey: 'nav.stats', icon: CreditCard },
+  { id: 'add', labelKey: 'nav.add', icon: Plus },
+  { id: 'ai', labelKey: 'nav.ai', icon: Activity },
+  { id: 'settings', labelKey: 'nav.settings', icon: User },
 ]
-
-const Icon = ({ id, active }) => {
-  const common = {
-    width: 22,
-    height: 22,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    strokeWidth: 1.5,
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    stroke: active ? '#ffffff' : 'rgba(255,255,255,0.45)',
-  }
-
-  switch (id) {
-    case 'history':
-      return (
-        <svg {...common}>
-          <path d="M3 11.5 12 4l9 7.5v8.5a1 1 0 0 1-1 1h-6.5v-5h-3v5H4a1 1 0 0 1-1-1z" />
-        </svg>
-      )
-    case 'add':
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="12" r="8" />
-          <path d="M12 8v8M8 12h8" />
-        </svg>
-      )
-    case 'stats':
-      return (
-        <svg {...common}>
-          <path d="M5 19V9m7 10V5m7 14v-7" />
-          <path d="M4 19h16" stroke={active ? '#7af0c7' : 'rgba(255,255,255,0.4)'} />
-        </svg>
-      )
-    case 'ai':
-      return (
-        <svg {...common}>
-          <path d="m12 3 2 3.5 4 1-2.5 3.6.4 4.4L12 14.5 8.1 15.5l.4-4.4L6 7.5l4-1z" />
-        </svg>
-      )
-    case 'settings':
-    default:
-      return (
-        <svg {...common}>
-          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-          <path d="m19.4 15-.9 1.5.4 1.7-1.6 1.6-1.7-.4-1.5.9L12 19.5l-1.6.8-1.5-.9-1.7.4-1.6-1.6.4-1.7-.9-1.5.9-1.5-.4-1.7 1.6-1.6 1.7.4 1.5-.9L12 4.5l1.6-.8 1.5.9 1.7-.4 1.6 1.6-.4 1.7.9 1.5-.9 1.5.4 1.7z" />
-        </svg>
-      )
-  }
-}
 
 const TabNavigation = ({ activeTab, onChange }) => {
   const { t } = useLocale()
 
   return (
-    <nav>
-      <div className="mx-auto rounded-[28px] border border-white/15 bg-gradient-to-r from-[#18142b] via-[#0f0f1f] to-[#18142b] px-3 py-3 shadow-dash-neon">
-        <div className="grid grid-cols-5 gap-1">
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50">
+      <div className="bg-[#120F25]/95 backdrop-blur-xl border-t border-white/10">
+        <div className="flex items-center justify-around py-4 max-w-2xl mx-auto px-6">
           {TABS.map((tab) => {
             const isActive = tab.id === activeTab
+            const IconComponent = tab.icon
             return (
               <button
                 key={tab.id}
                 onClick={() => onChange(tab.id)}
-                className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] transition ${
-                  isActive
-                    ? 'bg-white/15 text-white shadow-[0_10px_25px_rgba(0,0,0,0.35)]'
-                    : 'text-white/50 hover:text-white'
+                className={`flex flex-col items-center gap-1 transition-colors ${
+                  isActive ? 'text-white' : 'text-white/40 hover:text-white/60'
                 }`}
               >
-                <Icon id={tab.id} active={isActive} />
-                {t(tab.labelKey)}
+                <IconComponent className="size-6" strokeWidth={isActive ? 2.5 : 2} />
+                <span className="text-xs">{t(tab.labelKey)}</span>
               </button>
             )
           })}
