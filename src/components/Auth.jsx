@@ -22,7 +22,12 @@ const Auth = ({ onAuthSuccess }) => {
           email,
           password,
         })
-        if (error) throw error
+        
+        if (error) {
+          console.error('Sign in error:', error)
+          throw error
+        }
+        
         if (data.user) {
           // onAuthSuccess будет вызван через onAuthStateChange в App.jsx
         }
@@ -32,7 +37,11 @@ const Auth = ({ onAuthSuccess }) => {
           email,
           password,
         })
-        if (error) throw error
+        
+        if (error) {
+          console.error('Sign up error:', error)
+          throw error
+        }
         
         if (data.user) {
           // Если сессия создана сразу (email подтверждение отключено в Supabase)
@@ -44,7 +53,6 @@ const Auth = ({ onAuthSuccess }) => {
             }, 100)
           } else {
             // Требуется подтверждение email
-            setError(null)
             const message = locale === 'ru' 
               ? 'Регистрация успешна! Проверьте email для подтверждения аккаунта, затем войдите.' 
               : 'Registration successful! Please check your email to confirm your account, then sign in.'
@@ -53,10 +61,35 @@ const Auth = ({ onAuthSuccess }) => {
             setEmail('')
             setPassword('')
           }
+        } else {
+          throw new Error(locale === 'ru' ? 'Не удалось создать пользователя' : 'Failed to create user')
         }
       }
     } catch (error) {
-      setError(error.message || (locale === 'ru' ? 'Произошла ошибка' : 'An error occurred'))
+      console.error('Auth error:', error)
+      // Более детальная обработка ошибок
+      let errorMessage = error.message || (locale === 'ru' ? 'Произошла ошибка' : 'An error occurred')
+      
+      // Специфичные сообщения для разных типов ошибок
+      if (error.message?.includes('email') || error.message?.includes('Email')) {
+        errorMessage = locale === 'ru' 
+          ? 'Ошибка с email адресом. Проверьте правильность ввода.'
+          : 'Email error. Please check your email address.'
+      } else if (error.message?.includes('password') || error.message?.includes('Password')) {
+        errorMessage = locale === 'ru'
+          ? 'Ошибка с паролем. Пароль должен содержать минимум 6 символов.'
+          : 'Password error. Password must be at least 6 characters.'
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        errorMessage = locale === 'ru'
+          ? 'Ошибка сети. Проверьте подключение к интернету.'
+          : 'Network error. Please check your internet connection.'
+      } else if (error.message?.includes('Load Failed') || error.message?.includes('Failed to load')) {
+        errorMessage = locale === 'ru'
+          ? 'Ошибка подключения к серверу. Проверьте настройки Supabase или попробуйте позже.'
+          : 'Connection error. Please check Supabase settings or try again later.'
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

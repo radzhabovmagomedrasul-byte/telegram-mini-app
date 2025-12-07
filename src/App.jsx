@@ -28,13 +28,36 @@ function App() {
   // Проверка сессии Supabase при загрузке
   useEffect(() => {
     let syncInterval
+    let timeoutId
     
     const checkSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
+        // Проверка сессии с таймаутом
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('Session check timeout')), 10000)
+        })
+        
+        let result
+        try {
+          result = await Promise.race([sessionPromise, timeoutPromise])
+        } catch (raceError) {
+          if (raceError.message === 'Session check timeout') {
+            console.warn('Session check timed out, assuming not authenticated')
+            setIsAuthenticated(false)
+            setLoading(false)
+            return
+          }
+          throw raceError
+        } finally {
+          if (timeoutId) clearTimeout(timeoutId)
+        }
+        
+        const { data: { session }, error } = result || { data: { session: null }, error: null }
         
         if (error) {
           console.error('Error checking session:', error)
+          setIsAuthenticated(false)
           setLoading(false)
           return
         }
@@ -44,7 +67,7 @@ function App() {
           setIsAuthenticated(true)
           setUserId(session.user.id)
           
-          // Попытка синхронизации с Firebase
+          // Попытка синхронизации с Firebase (не блокируем загрузку)
           syncFromFirebase(session.user.id)
             .then((synced) => {
               if (synced) {
@@ -56,7 +79,11 @@ function App() {
             })
           
           // Обновление активности
-          updateLastActivity()
+          try {
+            updateLastActivity()
+          } catch (e) {
+            console.log('Failed to update activity:', e)
+          }
           
           // Автоматическая синхронизация
           syncInterval = setInterval(() => {
@@ -81,7 +108,11 @@ function App() {
       if (session?.user) {
         setIsAuthenticated(true)
         setUserId(session.user.id)
-        updateLastActivity()
+        try {
+          updateLastActivity()
+        } catch (e) {
+          console.log('Failed to update activity:', e)
+        }
       } else {
         setIsAuthenticated(false)
         setUserId(null)
@@ -92,7 +123,12 @@ function App() {
       if (syncInterval) {
         clearInterval(syncInterval)
       }
-      subscription.unsubscribe()
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      if (subscription) {
+        subscription.unsubscribe()
+      }
     }
   }, [])
 
